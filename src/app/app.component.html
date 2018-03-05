@@ -1,0 +1,48 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div style="text-align:center">
+  <h1>
+    Welcome to {{ title }}!
+  </h1>
+</div>
+
+<tagbox 
+    id="tag1"
+    maxboxlength="300" 
+    maxtaglength="20"
+    maxtags="12" 
+    mintags="1" 
+    tabindex="0"
+    title="something should hasppen"
+    placeholder="Add new Tag"
+    (onselect)="updateSelection($event)"
+    (onchange)="updateTag($event)"
+    [tags]="myListTags"
+    [selectedindex]="[1,3]"
+    [beforeAction]="evaluateAction.bind(this)"
+    [autocomplete]="myAutocompleteSource"
+    [selectionpolicy]="mySelectionPolicy"
+    [editpolicy]="myEditPolicy" 
+    [dragpolicy]="myDragPolicy"></tagbox>
+<!-- formatters: mask, prepend, wrap, append -->
+<tagbox
+    id="tag2"
+    maxboxlength="100" 
+    maxtaglength="12"
+    maxtags="5" 
+    tabindex="0"
+    selectedindex="1"
+    delineateby=","
+    allowduplicates="false"
+    format="mask * 4"
+    placeholder="Add Data"
+    (onselect)="updateSelection($event)"
+    (onchange)="updateTag($event)"
+    [tags]="myStringTags"
+    [beforeAction]="evaluateAction.bind(this)"
+    [selectionpolicy]="mySelectionPolicy2"
+    [editpolicy]="myEditPolicy2" 
+    [dragpolicy]="myDragPolicy2"></tagbox>
+
+<ul class="logger">
+  <li *ngFor="let x of events" [textContent]="x | json"></li>
+</ul>

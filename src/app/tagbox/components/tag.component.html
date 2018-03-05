@@ -1,0 +1,34 @@
+
+<span #selector
+    *ngIf="!editMode && removable && isSelectable()" 
+    tabindex="0" 
+    class="selection fa"
+    (click)="select()"></span>
+<input 
+    *ngIf="editMode" 
+    class="editor" 
+    (blur)="tabout($event)"
+    (keyup)="edit($event)" 
+    [value]="name"
+    [attr.maxlength]="maxlength"
+    [attr.placeholder]="placeholder" #editor/>
+<div class="autocomplete off" *ngIf="editMode && autocomplete" #filler>
+  <ul>
+      <li *ngFor="let x of fillerList; let i = index" 
+        (click)="selectedFiller = i" 
+        [class.selected]="selectedFiller === i"
+        [textContent]="x"></li>
+  </ul>
+</div>
+<span 
+    *ngIf="!editMode" 
+    class="holder" 
+    [textContent]="placeholder ? placeholder : formattedName()"></span>
+<span 
+    *ngIf="!editMode && removable" 
+    tabindex="0" 
+    class="remove fa fa-times" 
+    (click)="remove()"></span>
+<span 
+    *ngIf="!removable" 
+    class="placeholder fa fa-plus-circle"></span>
