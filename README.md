@@ -1,11 +1,51 @@
 # Welcome to TagBox!
 
-Have you ever in need of a tag box that can provide many built in functionalities that suites you needs? TagBox is built with Angular 4+ code and is developed specifically without needing to use ngModel to avoid an existing bug in Angular which makes any program non-responsive if any component that uses ngModel is used within a template.  In Addition TagBox enhances bugs that are exists in other Angular libraries.  This code is created instead of making change request in other libraries because it is drastically enhancing issues found and may be incompatible for use for those who are already using them.
+Have you ever been in need of a tag box that can provide many built in functionalities that suites you needs? TagBox is built with Angular 4+ code and is developed specifically without needing to use ngModel to avoid an existing bug in Angular which makes any program non-responsive if any component that uses ngModel is used within a template.  In Addition TagBox enhances bugs that are exists in other Angular libraries.  This code is created instead of making change request in other libraries because it is drastically enhancing issues found and may be incompatible for use for those who are already using them.
 
+
+# Version 0.0.1
+
+The following are available functionalities presented in this version. 
+
+```
+DEPENDENCIES: "font-awesome": "^4.7.0" and "into-pipes": "^0.0.0"
+```
+
+## Formatting the tag display content.
+
+We are using "into-pipes" library. to see availabel formatting options, please follow what is supported by the library.
+
+## Sample Use
+
+```
+<tagbox
+	id="tag1"
+	[tags]="myListOfTagedImageUrls"
+	[format]="image"
+	[selectionpolicy]="mySelectionPolicy"
+	[editpolicy]="myEditPolicy"
+	[dragpolicy]="myDragPolicy"></tagbox>
+
+<tagbox
+	id="tag1"
+	[tags]="myTags"
+	[format]="wrap:@:?"
+	[selectionpolicy]="mySelectionPolicy"
+	[editpolicy]="myEditPolicy"
+	[dragpolicy]="myDragPolicy"></tagbox>
+<tagbox
+	id="tag1"
+	[tags]="myTags"
+	[format]="date:MMDDYYY"
+	[selectionpolicy]="mySelectionPolicy"
+	[editpolicy]="myEditPolicy"
+	[dragpolicy]="myDragPolicy"></tagbox>
+```
 
 # Version 0.0.0
 
-The following are available functionalities presented in this version. A formatting option will be added in the next version which will be released shortly.
+The following are available functionalities presented in this version. 
+
 ```
 DEPENDENCIES: "font-awesome": "^4.7.0"
 ```
@@ -112,5 +152,5 @@ updateTag(event) {
 
 ![alt text](https://raw.githubusercontent.com/msalehisedeh/tagbox/master/sample.png  "What you would see when a tagbox is used")
 
-[Source code](https://raw.githubusercontent.com/msalehisedeh/tagbox/)
+[Source code](https://github.com/msalehisedeh/tagbox)
 

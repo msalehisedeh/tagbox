@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter, ElementRef, Renderer, HostListener, ViewChild, NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { InToPipe, IntoPipeModule } from 'into-pipes';
 import { CommonModule } from '@angular/common';
 
 /**
@@ -70,7 +71,7 @@ class TagBoxComponent {
             });
         }
         else {
-            this._selectedindex = this.selectedindex;
+            this._selectedindex = this.selectedindex ? this.selectedindex : [];
         }
         if (this.tags && !(this.tags instanceof Array)) {
             const /** @type {?} */ x = String(this.tags);
@@ -416,10 +417,12 @@ TagBoxComponent.propDecorators = {
  */
 class TagComponent {
     /**
+     * @param {?} into
      * @param {?} el
      * @param {?} renderer
      */
-    constructor(el, renderer) {
+    constructor(into, el, renderer) {
+        this.into = into;
         this.el = el;
         this.renderer = renderer;
         this.selectedFiller = -1;
@@ -727,6 +730,7 @@ class TagComponent {
     formattedName() {
         let /** @type {?} */ result = this.name;
         if (this.format) {
+            result = this.into.transform(this.name, this.format);
         }
         return result;
     }
@@ -759,7 +763,7 @@ TagComponent.decorators = [
 <span
     *ngIf="!editMode"
     class="holder"
-    [textContent]="placeholder ? placeholder : formattedName()"></span>
+    [innerHTML]="placeholder ? placeholder : formattedName()"></span>
 <span
     *ngIf="!editMode && removable"
     tabindex="0"
@@ -780,6 +784,8 @@ TagComponent.decorators = [
           box-sizing:border-box;
   padding:3px 0;
   position:relative; }
+  :host ::ng-deep img{
+    width:50px; }
   :host.left-padded{
     padding-left:8px; }
   :host.drag-over:hover{
@@ -878,6 +884,7 @@ TagComponent.decorators = [
 ];
 /** @nocollapse */
 TagComponent.ctorParameters = () => [
+    { type: InToPipe, },
     { type: ElementRef, },
     { type: Renderer, },
 ];
@@ -921,7 +928,8 @@ class TagBoxModule {
 TagBoxModule.decorators = [
     { type: NgModule, args: [{
                 imports: [
-                    CommonModule
+                    CommonModule,
+                    IntoPipeModule
                 ],
                 declarations: [
                     TagBoxComponent,
@@ -951,5 +959,5 @@ TagBoxModule.ctorParameters = () => [];
  * Generated bundle index. Do not edit.
  */
 
-export { TagBoxComponent, TagBoxModule, TagComponent as ɵa };
+export { TagBoxComponent, DragDropPolicy, EditPolicy, Selectionpolicy, TagBoxModule, TagComponent as ɵa };
 //# sourceMappingURL=tagbox.js.map

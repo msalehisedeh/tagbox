@@ -23,7 +23,7 @@
 <span 
     *ngIf="!editMode" 
     class="holder" 
-    [textContent]="placeholder ? placeholder : formattedName()"></span>
+    [innerHTML]="placeholder ? placeholder : formattedName()"></span>
 <span 
     *ngIf="!editMode && removable" 
     tabindex="0" 

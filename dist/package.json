@@ -1,6 +1,6 @@
 {
   "name": "tagbox",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -14,21 +14,22 @@
     "@angular/common": "^5.0.0",
     "@angular/compiler": "^5.0.0",
     "@angular/core": "^5.0.0",
-    "font-awesome": "^4.7.0",
     "core-js": "^2.4.1",
+    "font-awesome": "^4.7.0",
+    "into-pipes": "0.0.0",
     "zone.js": "^0.8.14",
     "tslib": "^1.7.1"
   },
   "devDependencies": {
     "@angular/cli": "^1.6.7",
     "@angular/compiler-cli": "^5.0.0",
-    "@types/node": "~6.0.60",
-    "codelyzer": "~3.2.0",
+    "@types/node": "^6.0.60",
+    "codelyzer": "^3.2.0",
     "ng-packagr": "^2.0.0",
-    "protractor": "~5.1.2",
-    "ts-node": "~3.2.0",
-    "tslint": "~5.7.0",
-    "typescript": "~2.4.2"
+    "protractor": "^5.1.2",
+    "ts-node": "^3.2.0",
+    "tslint": "^5.7.0",
+    "typescript": "^2.4.2"
   },
   "main": "bundles/tagbox.umd.js",
   "module": "esm5/tagbox.js",

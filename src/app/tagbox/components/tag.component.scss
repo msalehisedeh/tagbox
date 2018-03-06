@@ -11,6 +11,10 @@
     padding: 3px 0;
     position: relative;
 
+    ::ng-deep img {
+        width: 50px;
+    }
+
     &.left-padded {
         padding-left: 8px;
     }

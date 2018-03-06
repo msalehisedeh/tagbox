@@ -21,6 +21,8 @@ import {
   EditPolicy
 } from '../interfaces/tagbox.interfaces';
 
+import { InToPipe } from 'into-pipes';
+
 @Component({
   selector: 'tag',
   templateUrl: './tag.component.html',
@@ -88,6 +90,7 @@ export class TagComponent implements OnInit {
   filler;
 
   constructor(
+    private into: InToPipe,
     public el: ElementRef, 
     private renderer: Renderer
   ){
@@ -316,7 +319,7 @@ export class TagComponent implements OnInit {
   formattedName() {
     let result = this.name;
     if (this.format) {
-
+      result = this.into.transform(this.name, this.format);
     }
     return result;
   }

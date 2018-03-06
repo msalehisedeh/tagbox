@@ -14,6 +14,9 @@ import {
 export class AppComponent {
   title = 'Tag Box';
   events: string[] = [];
+  myImageTags= [
+    "https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?h=350&auto=compress&cs=tinysrgb"
+  ];
   myListTags = ["something 1", "something 2", "something 3", "something 4", "something 5"];
   myStringTags = "something 1, something 2, something 3";
   mySelectionPolicy: Selectionpolicy = Selectionpolicy.multiSelect;

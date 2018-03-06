@@ -97,7 +97,7 @@ export class TagBoxComponent implements OnInit, OnChanges {
         this._selectedindex.push(parseInt(t));
       });
     } else {
-      this._selectedindex = this.selectedindex;
+      this._selectedindex = this.selectedindex ? this.selectedindex : [];
     }
 
     if (this.tags && !(this.tags instanceof Array)) {

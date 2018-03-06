@@ -1,6 +1,8 @@
 import { OnInit, ElementRef, Renderer, EventEmitter } from '@angular/core';
 import { DragDropPolicy, Selectionpolicy, EditPolicy } from '../interfaces/tagbox.interfaces';
+import { InToPipe } from 'into-pipes';
 export declare class TagComponent implements OnInit {
+    private into;
     el: ElementRef;
     private renderer;
     editMode: boolean;
@@ -25,7 +27,7 @@ export declare class TagComponent implements OnInit {
     editor: any;
     selector: any;
     filler: any;
-    constructor(el: ElementRef, renderer: Renderer);
+    constructor(into: InToPipe, el: ElementRef, renderer: Renderer);
     ngOnInit(): void;
     dragStart(event: any): void;
     drag(event: any): void;
