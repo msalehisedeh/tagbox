@@ -47,6 +47,7 @@
     placeholder="Add Data"
     (onselect)="updateSelection($event)"
     (onchange)="updateTag($event)"
+    (onerror)="showError($event)"
     [tags]="myStringTags"
     [beforeAction]="evaluateAction.bind(this)"
     [selectionpolicy]="mySelectionPolicy2"

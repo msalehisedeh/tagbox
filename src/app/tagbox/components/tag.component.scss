@@ -12,15 +12,15 @@
     position: relative;
 
     ::ng-deep img {
-        width: 50px;
+        height: 25px;
     }
 
     &.left-padded {
         padding-left: 8px;
     }
 
-    &.drag-over:hover {
-        background-color: #add8e6;
+    &.drag-over {
+        background-color: #add8e6 !important;
         cursor: move;
     }
 

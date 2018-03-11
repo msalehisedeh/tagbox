@@ -4,6 +4,7 @@
     tabindex="0"
     [class]="itemSelectionClass(i)"
     [name]="t"
+    [parent]="this"
     [removable]="isRemovable()"
     [maxlength]="maxtaglength"
     [format]="format"
@@ -22,6 +23,7 @@
     placeholder
     tabindex="0"
     name=""
+    [parent]="this"
     [class]="itemSelectionClass(-1)"
     [maxlength]="maxtaglength"
     [placeholder]="placeholder"

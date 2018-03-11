@@ -7,6 +7,7 @@ export declare class TagBoxComponent implements OnInit, OnChanges {
     _tags: string[];
     _selectedindex: number[];
     onchange: EventEmitter<{}>;
+    onerror: EventEmitter<{}>;
     onselect: EventEmitter<{}>;
     beforeAction: (event: any) => boolean;
     id: string;
@@ -15,6 +16,7 @@ export declare class TagBoxComponent implements OnInit, OnChanges {
     maxtaglength: number;
     maxtags: number;
     mintags: number;
+    formController: HTMLElement;
     tags: any;
     selectedindex: any;
     delineateby: string;
@@ -30,9 +32,14 @@ export declare class TagBoxComponent implements OnInit, OnChanges {
     itemSelectionClass(index: any): "selected" | "left-padded" | "";
     isRemovable(): boolean;
     private isDuplicate(name);
-    allowedToaddItem(tag: any): boolean;
+    private allowedToaddItem(name);
     private notifyChange();
     private notifySelection();
+    private createDropRequest(action, source, destination);
+    private prependTagAt(index, source, destination);
+    private appendTagAt(index, source, destination);
+    removeTagWithName(name: any): void;
+    addTagWithName(name: any): boolean;
     onTagRemove(event: TagComponent): void;
     onTagAdd(event: TagComponent): void;
     onTagChange(event: TagComponent): void;

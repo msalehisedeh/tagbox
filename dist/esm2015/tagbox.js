@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ElementRef, Renderer, HostListener, ViewChild, NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ElementRef, Renderer, Injectable, HostListener, ViewChild, NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { InToPipe, IntoPipeModule } from 'into-pipes';
 import { CommonModule } from '@angular/common';
 
@@ -53,6 +53,7 @@ class TagBoxComponent {
         this._tags = [];
         this._selectedindex = [];
         this.onchange = new EventEmitter();
+        this.onerror = new EventEmitter();
         this.onselect = new EventEmitter();
         this.beforeAction = (event) => true;
         this.placeholder = "Add Tag";
@@ -78,7 +79,7 @@ class TagBoxComponent {
             this._tags = x.split(this.delineateby ? this.delineateby : ",");
         }
         else {
-            this._tags = this.tags;
+            this._tags = this.tags ? this.tags : [];
         }
         this.renderer.setElementAttribute(this.el.nativeElement, "role", "list");
     }
@@ -111,6 +112,9 @@ class TagBoxComponent {
         let /** @type {?} */ canRemove = (this.editpolicy === EditPolicy.addAndRemove);
         canRemove = canRemove || (this.editpolicy === EditPolicy.removeOnly);
         canRemove = canRemove && (!this.mintags || (this._tags.length > this.mintags));
+        if (!canRemove) {
+            this.onerror.emit("Unable to remove tag. Operation is not allowed.");
+        }
         return canRemove;
     }
     /**
@@ -118,25 +122,26 @@ class TagBoxComponent {
      * @return {?}
      */
     isDuplicate(name) {
-        return this._tags.indexOf(name) < 0 ? false : true;
+        const /** @type {?} */ flag = this._tags.indexOf(name) < 0 ? false : true;
+        if (flag) {
+            this.onerror.emit("Unable to perform operation. Resulting duplicate tags is not allowed.");
+        }
+        return flag;
     }
     /**
-     * @param {?} tag
+     * @param {?} name
      * @return {?}
      */
-    allowedToaddItem(tag) {
+    allowedToaddItem(name) {
         let /** @type {?} */ canAdd = (this.editpolicy === EditPolicy.addAndRemove);
         canAdd = canAdd || (this.editpolicy === EditPolicy.addOnly);
-        canAdd = canAdd && (!this.maxtags || (this._tags.length < this.maxtags - 1));
-        canAdd = canAdd && !this.isDuplicate(tag.name);
+        canAdd = canAdd && (!this.maxtags || (this._tags.length < this.maxtags));
+        canAdd = canAdd && !this.isDuplicate(name);
         if (canAdd && this.maxtaglength) {
             const /** @type {?} */ x = this._tags.join(this.delineateby ? this.delineateby : ",");
-            if (x.length + tag.name.length + 1 >= this.maxboxlength) {
+            if (x.length + name.length + 1 >= this.maxboxlength) {
                 canAdd = false;
-                this.renderer.setElementClass(this.el.nativeElement, "alert", true);
-            }
-            else {
-                this.renderer.setElementClass(this.el.nativeElement, "alert", false);
+                this.onerror.emit("Unable to add tag. Resulting content will exceed maxtaglength.");
             }
         }
         return canAdd;
@@ -152,7 +157,8 @@ class TagBoxComponent {
         this.onchange.emit({
             id: this.id,
             tags: this.tags,
-            selecedIndex: this.selectedindex
+            selecedIndex: this.selectedindex,
+            formController: this.formController
         });
     }
     /**
@@ -164,16 +170,71 @@ class TagBoxComponent {
             (this._selectedindex.length ? this._selectedindex.join(",") : "");
         this.onselect.emit({
             id: this.id,
-            selecedIndex: this.selectedindex
+            selecedIndex: this.selectedindex,
+            formController: this.formController
         });
     }
     /**
-     * @param {?} event
+     * @param {?} action
+     * @param {?} source
+     * @param {?} destination
      * @return {?}
      */
-    onTagRemove(event) {
-        if (this.isRemovable() && this.beforeAction({ request: "remove", item: event.name })) {
-            const /** @type {?} */ index = this._tags.indexOf(event.name);
+    createDropRequest(action, source, destination) {
+        return {
+            request: "drop",
+            action: action,
+            source: {
+                id: source.parent.id,
+                name: source.name
+            },
+            destination: {
+                id: destination.parent.id,
+                name: destination.name
+            }
+        };
+    }
+    /**
+     * @param {?} index
+     * @param {?} source
+     * @param {?} destination
+     * @return {?}
+     */
+    prependTagAt(index, source, destination) {
+        let /** @type {?} */ result = false;
+        const /** @type {?} */ newName = source.name + " " + this._tags[index];
+        if (!this.maxtaglength || (this.maxtaglength && source.name.length <= this.maxtaglength)) {
+            if (this.beforeAction(this.createDropRequest("prepend", source, destination))) {
+                this._tags[index] = newName;
+                result = true;
+            }
+        }
+        return result;
+    }
+    /**
+     * @param {?} index
+     * @param {?} source
+     * @param {?} destination
+     * @return {?}
+     */
+    appendTagAt(index, source, destination) {
+        let /** @type {?} */ result = false;
+        const /** @type {?} */ newName = this._tags[index] + " " + source.name;
+        if (!this.maxtaglength || (this.maxtaglength && source.name.length <= this.maxtaglength)) {
+            if (this.beforeAction(this.createDropRequest("append", source, destination))) {
+                this._tags[index] = newName;
+                result = true;
+            }
+        }
+        return result;
+    }
+    /**
+     * @param {?} name
+     * @return {?}
+     */
+    removeTagWithName(name) {
+        if (this.isRemovable() && this.beforeAction({ request: "remove", item: name })) {
+            const /** @type {?} */ index = this._tags.indexOf(name);
             const /** @type {?} */ i = this._selectedindex.indexOf(index);
             this._tags.splice(index, 1);
             if (i >= 0) {
@@ -183,19 +244,38 @@ class TagBoxComponent {
         }
     }
     /**
+     * @param {?} name
+     * @return {?}
+     */
+    addTagWithName(name) {
+        let /** @type {?} */ index = this._tags.indexOf(name);
+        const /** @type {?} */ i = this._selectedindex.indexOf(index);
+        if (index < 0 &&
+            name.length &&
+            this.allowedToaddItem(name) &&
+            this.beforeAction({ request: "add", item: name })) {
+            this._tags.push(name);
+            this.notifyChange();
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    /**
+     * @param {?} event
+     * @return {?}
+     */
+    onTagRemove(event) {
+        this.removeTagWithName(event.name);
+    }
+    /**
      * @param {?} event
      * @return {?}
      */
     onTagAdd(event) {
-        let /** @type {?} */ index = this._tags.indexOf(event.name);
-        const /** @type {?} */ i = this._selectedindex.indexOf(index);
-        if (index < 0 &&
-            event.name.length &&
-            this.allowedToaddItem(event) &&
-            this.beforeAction({ request: "add", item: event.name })) {
-            this._tags.push(event.name);
+        if (this.addTagWithName(event.name)) {
             event.name = "";
-            this.notifyChange();
             event.click(null);
         }
         else {
@@ -222,36 +302,52 @@ class TagBoxComponent {
      * @return {?}
      */
     onTagDrop(event) {
-        const /** @type {?} */ sind = this._tags.indexOf(event.source);
-        const /** @type {?} */ dind = this._tags.indexOf(event.destination);
+        const /** @type {?} */ sind = this._tags.indexOf(event.source.name);
+        const /** @type {?} */ dind = this._tags.indexOf(event.destination.name);
         if (this.dragpolicy === DragDropPolicy.appendOnDrop) {
-            const /** @type {?} */ i = this._selectedindex.indexOf(sind);
-            const /** @type {?} */ name = event.destination + " " + event.source;
-            if (!this.maxtaglength || (this.maxtaglength && name.length <= this.maxtaglength)) {
-                if (this.beforeAction({ request: "drop", action: "append", source: event.source, destination: event.destination })) {
-                    this._tags[dind] = name;
+            if (event.source.parent.id === event.destination.parent.id) {
+                if (this.appendTagAt(dind, event.source, event.destination)) {
+                    const /** @type {?} */ i = this._selectedindex.indexOf(sind);
                     this._tags.splice(sind, 1);
                     this._selectedindex.splice(i, 1);
                     this.notifyChange();
+                }
+            }
+            else {
+                if (this.appendTagAt(dind, event.source, event.destination)) {
+                    this.notifyChange();
+                    event.source.parent.removeTagWithName(event.source.name);
                 }
             }
         }
         else if (this.dragpolicy === DragDropPolicy.prependOnDrop) {
-            const /** @type {?} */ i = this._selectedindex.indexOf(sind);
-            const /** @type {?} */ name = event.source + " " + event.destination;
-            if (!this.maxtaglength || (this.maxtaglength && name.length <= this.maxtaglength)) {
-                if (this.beforeAction({ request: "drop", action: "prepend", source: event.source, destination: event.destination })) {
-                    this._tags[dind] = name;
+            if (event.source.parent.id === event.destination.parent.id) {
+                if (this.prependTagAt(dind, event.source, event.destination)) {
+                    const /** @type {?} */ i = this._selectedindex.indexOf(sind);
                     this._tags.splice(sind, 1);
                     this._selectedindex.splice(i, 1);
                     this.notifyChange();
                 }
             }
+            else {
+                if (this.prependTagAt(dind, event.source, event.destination)) {
+                    this.notifyChange();
+                    event.source.parent.removeTagWithName(event.source.name);
+                }
+            }
         }
         if (this.dragpolicy === DragDropPolicy.swapOnDrop) {
-            if (this.beforeAction({ request: "drop", action: "swap", source: event.source, destination: event.destination })) {
-                this._tags[sind] = this._tags.splice(dind, 1, this._tags[sind])[0];
-                this.notifyChange();
+            if (this.beforeAction(this.createDropRequest("swap", event.source, event.destination))) {
+                if (event.source.parent.id === event.destination.parent.id) {
+                    this._tags[sind] = this._tags.splice(dind, 1, this._tags[sind])[0];
+                    this.notifyChange();
+                }
+                else {
+                    if (this.addTagWithName(event.source.name)) {
+                        this.removeTagWithName(event.destination.name);
+                        event.source.parent.removeTagWithName(event.source.name);
+                    }
+                }
             }
         }
     }
@@ -325,6 +421,7 @@ class TagBoxComponent {
 }
 TagBoxComponent.decorators = [
     { type: Component, args: [{
+                // changeDetection: ChangeDetectionStrategy.OnPush,
                 selector: 'tagbox',
                 template: `
 <tag theme
@@ -332,6 +429,7 @@ TagBoxComponent.decorators = [
     tabindex="0"
     [class]="itemSelectionClass(i)"
     [name]="t"
+    [parent]="this"
     [removable]="isRemovable()"
     [maxlength]="maxtaglength"
     [format]="format"
@@ -350,6 +448,7 @@ TagBoxComponent.decorators = [
     placeholder
     tabindex="0"
     name=""
+    [parent]="this"
     [class]="itemSelectionClass(-1)"
     [maxlength]="maxtaglength"
     [placeholder]="placeholder"
@@ -367,7 +466,7 @@ TagBoxComponent.decorators = [
 `,
                 styles: [`:host{
   background-color:#fff;
-  border:1px inset #888;
+  border:1px solid #ced4da;
   -webkit-box-sizing:border-box;
   box-sizing:border-box;
   display:inline-block;
@@ -393,6 +492,7 @@ TagBoxComponent.ctorParameters = () => [
 ];
 TagBoxComponent.propDecorators = {
     "onchange": [{ type: Output, args: ["onchange",] },],
+    "onerror": [{ type: Output, args: ["onerror",] },],
     "onselect": [{ type: Output, args: ["onselect",] },],
     "beforeAction": [{ type: Input, args: ["beforeAction",] },],
     "id": [{ type: Input, args: ["id",] },],
@@ -401,6 +501,7 @@ TagBoxComponent.propDecorators = {
     "maxtaglength": [{ type: Input, args: ["maxtaglength",] },],
     "maxtags": [{ type: Input, args: ["maxtags",] },],
     "mintags": [{ type: Input, args: ["mintags",] },],
+    "formController": [{ type: Input, args: ["formController",] },],
     "tags": [{ type: Input, args: ["tags",] },],
     "selectedindex": [{ type: Input, args: ["selectedindex",] },],
     "delineateby": [{ type: Input, args: ["delineateby",] },],
@@ -415,13 +516,45 @@ TagBoxComponent.propDecorators = {
  * @fileoverview added by tsickle
  * @suppress {checkTypes} checked by tsc
  */
+class TagTransfer {
+    constructor() {
+        this.data = {};
+    }
+    /**
+     * @param {?} name
+     * @param {?} value
+     * @return {?}
+     */
+    setData(name, value) {
+        this.data[name] = value;
+    }
+    /**
+     * @param {?} name
+     * @return {?}
+     */
+    getData(name) {
+        return this.data[name];
+    }
+}
+TagTransfer.decorators = [
+    { type: Injectable },
+];
+/** @nocollapse */
+TagTransfer.ctorParameters = () => [];
+
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes} checked by tsc
+ */
 class TagComponent {
     /**
+     * @param {?} dataTransfer
      * @param {?} into
      * @param {?} el
      * @param {?} renderer
      */
-    constructor(into, el, renderer) {
+    constructor(dataTransfer, into, el, renderer) {
+        this.dataTransfer = dataTransfer;
         this.into = into;
         this.el = el;
         this.renderer = renderer;
@@ -447,7 +580,8 @@ class TagComponent {
     dragStart(event) {
         event.stopPropagation();
         if (this.allowDrag()) {
-            event.dataTransfer.setData("source", this.name);
+            event.dataTransfer.setData("source", this.name); // this is needed to get the darg/drop going..
+            this.dataTransfer.setData("source", this); // this is needed because event data transfer takes string not bject
         }
     }
     /**
@@ -471,8 +605,8 @@ class TagComponent {
         event.preventDefault();
         this.renderer.setElementClass(this.el.nativeElement, "drag-over", false);
         this.ondrop.emit({
-            source: event.dataTransfer.getData("source"),
-            destination: this.name
+            source: this.dataTransfer.getData("source"),
+            destination: this
         });
     }
     /**
@@ -514,8 +648,8 @@ class TagComponent {
      * @return {?}
      */
     allowDrop(event) {
-        const /** @type {?} */ source = event.dataTransfer.getData("source");
-        return (source && source != this.name) && this.name && this.name.length > 0;
+        const /** @type {?} */ source = this.dataTransfer.getData("source");
+        return (source && source.name != this.name) && this.name && this.name.length > 0;
     }
     /**
      * @return {?}
@@ -785,11 +919,11 @@ TagComponent.decorators = [
   padding:3px 0;
   position:relative; }
   :host ::ng-deep img{
-    width:50px; }
+    height:25px; }
   :host.left-padded{
     padding-left:8px; }
-  :host.drag-over:hover{
-    background-color:#add8e6;
+  :host.drag-over{
+    background-color:#add8e6 !important;
     cursor:move; }
   :host[placeholder]{
     background-color:transparent;
@@ -884,6 +1018,7 @@ TagComponent.decorators = [
 ];
 /** @nocollapse */
 TagComponent.ctorParameters = () => [
+    { type: TagTransfer, },
     { type: InToPipe, },
     { type: ElementRef, },
     { type: Renderer, },
@@ -900,6 +1035,7 @@ TagComponent.propDecorators = {
     "maxlength": [{ type: Input, args: ["maxlength",] },],
     "name": [{ type: Input, args: ["name",] },],
     "placeholder": [{ type: Input, args: ["placeholder",] },],
+    "parent": [{ type: Input, args: ["parent",] },],
     "autocomplete": [{ type: Input, args: ["autocomplete",] },],
     "selectionpolicy": [{ type: Input, args: ["selectionpolicy",] },],
     "editpolicy": [{ type: Input, args: ["editpolicy",] },],
@@ -939,7 +1075,9 @@ TagBoxModule.decorators = [
                     TagBoxComponent
                 ],
                 entryComponents: [],
-                providers: [],
+                providers: [
+                    TagTransfer
+                ],
                 schemas: [CUSTOM_ELEMENTS_SCHEMA]
             },] },
 ];
@@ -959,5 +1097,5 @@ TagBoxModule.ctorParameters = () => [];
  * Generated bundle index. Do not edit.
  */
 
-export { TagBoxComponent, DragDropPolicy, EditPolicy, Selectionpolicy, TagBoxModule, TagComponent as ɵa };
+export { TagBoxComponent, DragDropPolicy, EditPolicy, Selectionpolicy, TagBoxModule, TagComponent as ɵa, TagTransfer as ɵb };
 //# sourceMappingURL=tagbox.js.map

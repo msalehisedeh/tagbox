@@ -39,6 +39,7 @@ var TagBoxComponent = /** @class */ (function () {
         this._tags = [];
         this._selectedindex = [];
         this.onchange = new core.EventEmitter();
+        this.onerror = new core.EventEmitter();
         this.onselect = new core.EventEmitter();
         this.beforeAction = function (event) { return true; };
         this.placeholder = "Add Tag";
@@ -62,7 +63,7 @@ var TagBoxComponent = /** @class */ (function () {
             this._tags = x.split(this.delineateby ? this.delineateby : ",");
         }
         else {
-            this._tags = this.tags;
+            this._tags = this.tags ? this.tags : [];
         }
         this.renderer.setElementAttribute(this.el.nativeElement, "role", "list");
     };
@@ -80,24 +81,28 @@ var TagBoxComponent = /** @class */ (function () {
         var canRemove = (this.editpolicy === EditPolicy.addAndRemove);
         canRemove = canRemove || (this.editpolicy === EditPolicy.removeOnly);
         canRemove = canRemove && (!this.mintags || (this._tags.length > this.mintags));
+        if (!canRemove) {
+            this.onerror.emit("Unable to remove tag. Operation is not allowed.");
+        }
         return canRemove;
     };
     TagBoxComponent.prototype.isDuplicate = function (name) {
-        return this._tags.indexOf(name) < 0 ? false : true;
+        var flag = this._tags.indexOf(name) < 0 ? false : true;
+        if (flag) {
+            this.onerror.emit("Unable to perform operation. Resulting duplicate tags is not allowed.");
+        }
+        return flag;
     };
-    TagBoxComponent.prototype.allowedToaddItem = function (tag) {
+    TagBoxComponent.prototype.allowedToaddItem = function (name) {
         var canAdd = (this.editpolicy === EditPolicy.addAndRemove);
         canAdd = canAdd || (this.editpolicy === EditPolicy.addOnly);
-        canAdd = canAdd && (!this.maxtags || (this._tags.length < this.maxtags - 1));
-        canAdd = canAdd && !this.isDuplicate(tag.name);
+        canAdd = canAdd && (!this.maxtags || (this._tags.length < this.maxtags));
+        canAdd = canAdd && !this.isDuplicate(name);
         if (canAdd && this.maxtaglength) {
             var x = this._tags.join(this.delineateby ? this.delineateby : ",");
-            if (x.length + tag.name.length + 1 >= this.maxboxlength) {
+            if (x.length + name.length + 1 >= this.maxboxlength) {
                 canAdd = false;
-                this.renderer.setElementClass(this.el.nativeElement, "alert", true);
-            }
-            else {
-                this.renderer.setElementClass(this.el.nativeElement, "alert", false);
+                this.onerror.emit("Unable to add tag. Resulting content will exceed maxtaglength.");
             }
         }
         return canAdd;
@@ -110,7 +115,8 @@ var TagBoxComponent = /** @class */ (function () {
         this.onchange.emit({
             id: this.id,
             tags: this.tags,
-            selecedIndex: this.selectedindex
+            selecedIndex: this.selectedindex,
+            formController: this.formController
         });
     };
     TagBoxComponent.prototype.notifySelection = function () {
@@ -119,12 +125,49 @@ var TagBoxComponent = /** @class */ (function () {
             (this._selectedindex.length ? this._selectedindex.join(",") : "");
         this.onselect.emit({
             id: this.id,
-            selecedIndex: this.selectedindex
+            selecedIndex: this.selectedindex,
+            formController: this.formController
         });
     };
-    TagBoxComponent.prototype.onTagRemove = function (event) {
-        if (this.isRemovable() && this.beforeAction({ request: "remove", item: event.name })) {
-            var index = this._tags.indexOf(event.name);
+    TagBoxComponent.prototype.createDropRequest = function (action, source, destination) {
+        return {
+            request: "drop",
+            action: action,
+            source: {
+                id: source.parent.id,
+                name: source.name
+            },
+            destination: {
+                id: destination.parent.id,
+                name: destination.name
+            }
+        };
+    };
+    TagBoxComponent.prototype.prependTagAt = function (index, source, destination) {
+        var result = false;
+        var newName = source.name + " " + this._tags[index];
+        if (!this.maxtaglength || (this.maxtaglength && source.name.length <= this.maxtaglength)) {
+            if (this.beforeAction(this.createDropRequest("prepend", source, destination))) {
+                this._tags[index] = newName;
+                result = true;
+            }
+        }
+        return result;
+    };
+    TagBoxComponent.prototype.appendTagAt = function (index, source, destination) {
+        var result = false;
+        var newName = this._tags[index] + " " + source.name;
+        if (!this.maxtaglength || (this.maxtaglength && source.name.length <= this.maxtaglength)) {
+            if (this.beforeAction(this.createDropRequest("append", source, destination))) {
+                this._tags[index] = newName;
+                result = true;
+            }
+        }
+        return result;
+    };
+    TagBoxComponent.prototype.removeTagWithName = function (name) {
+        if (this.isRemovable() && this.beforeAction({ request: "remove", item: name })) {
+            var index = this._tags.indexOf(name);
             var i = this._selectedindex.indexOf(index);
             this._tags.splice(index, 1);
             if (i >= 0) {
@@ -133,16 +176,27 @@ var TagBoxComponent = /** @class */ (function () {
             }
         }
     };
-    TagBoxComponent.prototype.onTagAdd = function (event) {
-        var index = this._tags.indexOf(event.name);
+    TagBoxComponent.prototype.addTagWithName = function (name) {
+        var index = this._tags.indexOf(name);
         var i = this._selectedindex.indexOf(index);
         if (index < 0 &&
-            event.name.length &&
-            this.allowedToaddItem(event) &&
-            this.beforeAction({ request: "add", item: event.name })) {
-            this._tags.push(event.name);
-            event.name = "";
+            name.length &&
+            this.allowedToaddItem(name) &&
+            this.beforeAction({ request: "add", item: name })) {
+            this._tags.push(name);
             this.notifyChange();
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    TagBoxComponent.prototype.onTagRemove = function (event) {
+        this.removeTagWithName(event.name);
+    };
+    TagBoxComponent.prototype.onTagAdd = function (event) {
+        if (this.addTagWithName(event.name)) {
+            event.name = "";
             event.click(null);
         }
         else {
@@ -161,36 +215,52 @@ var TagBoxComponent = /** @class */ (function () {
         }
     };
     TagBoxComponent.prototype.onTagDrop = function (event) {
-        var sind = this._tags.indexOf(event.source);
-        var dind = this._tags.indexOf(event.destination);
+        var sind = this._tags.indexOf(event.source.name);
+        var dind = this._tags.indexOf(event.destination.name);
         if (this.dragpolicy === DragDropPolicy.appendOnDrop) {
-            var i = this._selectedindex.indexOf(sind);
-            var name = event.destination + " " + event.source;
-            if (!this.maxtaglength || (this.maxtaglength && name.length <= this.maxtaglength)) {
-                if (this.beforeAction({ request: "drop", action: "append", source: event.source, destination: event.destination })) {
-                    this._tags[dind] = name;
+            if (event.source.parent.id === event.destination.parent.id) {
+                if (this.appendTagAt(dind, event.source, event.destination)) {
+                    var i = this._selectedindex.indexOf(sind);
                     this._tags.splice(sind, 1);
                     this._selectedindex.splice(i, 1);
                     this.notifyChange();
+                }
+            }
+            else {
+                if (this.appendTagAt(dind, event.source, event.destination)) {
+                    this.notifyChange();
+                    event.source.parent.removeTagWithName(event.source.name);
                 }
             }
         }
         else if (this.dragpolicy === DragDropPolicy.prependOnDrop) {
-            var i = this._selectedindex.indexOf(sind);
-            var name = event.source + " " + event.destination;
-            if (!this.maxtaglength || (this.maxtaglength && name.length <= this.maxtaglength)) {
-                if (this.beforeAction({ request: "drop", action: "prepend", source: event.source, destination: event.destination })) {
-                    this._tags[dind] = name;
+            if (event.source.parent.id === event.destination.parent.id) {
+                if (this.prependTagAt(dind, event.source, event.destination)) {
+                    var i = this._selectedindex.indexOf(sind);
                     this._tags.splice(sind, 1);
                     this._selectedindex.splice(i, 1);
                     this.notifyChange();
                 }
             }
+            else {
+                if (this.prependTagAt(dind, event.source, event.destination)) {
+                    this.notifyChange();
+                    event.source.parent.removeTagWithName(event.source.name);
+                }
+            }
         }
         if (this.dragpolicy === DragDropPolicy.swapOnDrop) {
-            if (this.beforeAction({ request: "drop", action: "swap", source: event.source, destination: event.destination })) {
-                this._tags[sind] = this._tags.splice(dind, 1, this._tags[sind])[0];
-                this.notifyChange();
+            if (this.beforeAction(this.createDropRequest("swap", event.source, event.destination))) {
+                if (event.source.parent.id === event.destination.parent.id) {
+                    this._tags[sind] = this._tags.splice(dind, 1, this._tags[sind])[0];
+                    this.notifyChange();
+                }
+                else {
+                    if (this.addTagWithName(event.source.name)) {
+                        this.removeTagWithName(event.destination.name);
+                        event.source.parent.removeTagWithName(event.source.name);
+                    }
+                }
             }
         }
     };
@@ -256,8 +326,8 @@ var TagBoxComponent = /** @class */ (function () {
 TagBoxComponent.decorators = [
     { type: core.Component, args: [{
                 selector: 'tagbox',
-                template: "\n<tag theme\n    *ngFor=\"let t of _tags; let i=index\"\n    tabindex=\"0\"\n    [class]=\"itemSelectionClass(i)\"\n    [name]=\"t\"\n    [removable]=\"isRemovable()\"\n    [maxlength]=\"maxtaglength\"\n    [format]=\"format\"\n    [autocomplete]=\"autocomplete\"\n    [attr.role]=\"'listitem'\"\n    [selectionpolicy]=\"selectionpolicy\"\n    [editpolicy]=\"editpolicy\"\n    [dragpolicy]=\"dragpolicy\"\n    (ondrop)=\"onTagDrop($event)\"\n    (onchange)=\"onTagChange($event)\"\n    (onadd)=\"onTagAdd($event)\"\n    (onremove)=\"onTagRemove($event)\"\n    (onselect)=\"onTagSelect($event)\"\n    (onfocus)=\"onTagFocus($event)\">\n</tag><tag theme\n    placeholder\n    tabindex=\"0\"\n    name=\"\"\n    [class]=\"itemSelectionClass(-1)\"\n    [maxlength]=\"maxtaglength\"\n    [placeholder]=\"placeholder\"\n    [format]=\"format\"\n    [autocomplete]=\"autocomplete\"\n    [attr.role]=\"'listitem'\"\n    [selectionpolicy]=\"selectionpolicy\"\n    [editpolicy]=\"editpolicy\"\n    [dragpolicy]=\"dragpolicy\"\n    (ondrop)=\"onTagDrop($event)\"\n    (onchange)=\"onTagChange($event)\"\n    (onadd)=\"onTagAdd($event)\"\n    (onremove)=\"onTagRemove($event)\"\n    (onfocus)=\"onTagFocus($event)\"></tag>\n",
-                styles: [":host{\n  background-color:#fff;\n  border:1px inset #888;\n  -webkit-box-sizing:border-box;\n  box-sizing:border-box;\n  display:inline-block;\n  min-height:50px;\n  padding:5px;\n  width:100%;\n  border-radius:5px;\n  margin-bottom:5px; }\n  :host.alert{\n    background-color:#ff9f9b;\n    border-color:#880500; }\n:host:focus{\n  border-color:#0ba; }\n:host:hover{\n  background-color:#ddd; }\n"],
+                template: "\n<tag theme\n    *ngFor=\"let t of _tags; let i=index\"\n    tabindex=\"0\"\n    [class]=\"itemSelectionClass(i)\"\n    [name]=\"t\"\n    [parent]=\"this\"\n    [removable]=\"isRemovable()\"\n    [maxlength]=\"maxtaglength\"\n    [format]=\"format\"\n    [autocomplete]=\"autocomplete\"\n    [attr.role]=\"'listitem'\"\n    [selectionpolicy]=\"selectionpolicy\"\n    [editpolicy]=\"editpolicy\"\n    [dragpolicy]=\"dragpolicy\"\n    (ondrop)=\"onTagDrop($event)\"\n    (onchange)=\"onTagChange($event)\"\n    (onadd)=\"onTagAdd($event)\"\n    (onremove)=\"onTagRemove($event)\"\n    (onselect)=\"onTagSelect($event)\"\n    (onfocus)=\"onTagFocus($event)\">\n</tag><tag theme\n    placeholder\n    tabindex=\"0\"\n    name=\"\"\n    [parent]=\"this\"\n    [class]=\"itemSelectionClass(-1)\"\n    [maxlength]=\"maxtaglength\"\n    [placeholder]=\"placeholder\"\n    [format]=\"format\"\n    [autocomplete]=\"autocomplete\"\n    [attr.role]=\"'listitem'\"\n    [selectionpolicy]=\"selectionpolicy\"\n    [editpolicy]=\"editpolicy\"\n    [dragpolicy]=\"dragpolicy\"\n    (ondrop)=\"onTagDrop($event)\"\n    (onchange)=\"onTagChange($event)\"\n    (onadd)=\"onTagAdd($event)\"\n    (onremove)=\"onTagRemove($event)\"\n    (onfocus)=\"onTagFocus($event)\"></tag>\n",
+                styles: [":host{\n  background-color:#fff;\n  border:1px solid #ced4da;\n  -webkit-box-sizing:border-box;\n  box-sizing:border-box;\n  display:inline-block;\n  min-height:50px;\n  padding:5px;\n  width:100%;\n  border-radius:5px;\n  margin-bottom:5px; }\n  :host.alert{\n    background-color:#ff9f9b;\n    border-color:#880500; }\n:host:focus{\n  border-color:#0ba; }\n:host:hover{\n  background-color:#ddd; }\n"],
             },] },
 ];
 TagBoxComponent.ctorParameters = function () { return [
@@ -266,6 +336,7 @@ TagBoxComponent.ctorParameters = function () { return [
 ]; };
 TagBoxComponent.propDecorators = {
     "onchange": [{ type: core.Output, args: ["onchange",] },],
+    "onerror": [{ type: core.Output, args: ["onerror",] },],
     "onselect": [{ type: core.Output, args: ["onselect",] },],
     "beforeAction": [{ type: core.Input, args: ["beforeAction",] },],
     "id": [{ type: core.Input, args: ["id",] },],
@@ -274,6 +345,7 @@ TagBoxComponent.propDecorators = {
     "maxtaglength": [{ type: core.Input, args: ["maxtaglength",] },],
     "maxtags": [{ type: core.Input, args: ["maxtags",] },],
     "mintags": [{ type: core.Input, args: ["mintags",] },],
+    "formController": [{ type: core.Input, args: ["formController",] },],
     "tags": [{ type: core.Input, args: ["tags",] },],
     "selectedindex": [{ type: core.Input, args: ["selectedindex",] },],
     "delineateby": [{ type: core.Input, args: ["delineateby",] },],
@@ -283,8 +355,25 @@ TagBoxComponent.propDecorators = {
     "editpolicy": [{ type: core.Input, args: ["editpolicy",] },],
     "dragpolicy": [{ type: core.Input, args: ["dragpolicy",] },],
 };
+var TagTransfer = /** @class */ (function () {
+    function TagTransfer() {
+        this.data = {};
+    }
+    TagTransfer.prototype.setData = function (name, value) {
+        this.data[name] = value;
+    };
+    TagTransfer.prototype.getData = function (name) {
+        return this.data[name];
+    };
+    return TagTransfer;
+}());
+TagTransfer.decorators = [
+    { type: core.Injectable },
+];
+TagTransfer.ctorParameters = function () { return []; };
 var TagComponent = /** @class */ (function () {
-    function TagComponent(into, el, renderer) {
+    function TagComponent(dataTransfer, into, el, renderer) {
+        this.dataTransfer = dataTransfer;
         this.into = into;
         this.el = el;
         this.renderer = renderer;
@@ -304,6 +393,7 @@ var TagComponent = /** @class */ (function () {
         event.stopPropagation();
         if (this.allowDrag()) {
             event.dataTransfer.setData("source", this.name);
+            this.dataTransfer.setData("source", this);
         }
     };
     TagComponent.prototype.drag = function (event) { };
@@ -315,8 +405,8 @@ var TagComponent = /** @class */ (function () {
         event.preventDefault();
         this.renderer.setElementClass(this.el.nativeElement, "drag-over", false);
         this.ondrop.emit({
-            source: event.dataTransfer.getData("source"),
-            destination: this.name
+            source: this.dataTransfer.getData("source"),
+            destination: this
         });
     };
     TagComponent.prototype.dragEnter = function (event) {
@@ -342,8 +432,8 @@ var TagComponent = /** @class */ (function () {
         }
     };
     TagComponent.prototype.allowDrop = function (event) {
-        var source = event.dataTransfer.getData("source");
-        return (source && source != this.name) && this.name && this.name.length > 0;
+        var source = this.dataTransfer.getData("source");
+        return (source && source.name != this.name) && this.name && this.name.length > 0;
     };
     TagComponent.prototype.allowDrag = function () {
         return (this.dragpolicy !== DragDropPolicy.disabled) && this.name && this.name.length > 0;
@@ -511,10 +601,11 @@ TagComponent.decorators = [
     { type: core.Component, args: [{
                 selector: 'tag',
                 template: "\n<span #selector\n    *ngIf=\"!editMode && removable && isSelectable()\"\n    tabindex=\"0\"\n    class=\"selection fa\"\n    (click)=\"select()\"></span>\n<input\n    *ngIf=\"editMode\"\n    class=\"editor\"\n    (blur)=\"tabout($event)\"\n    (keyup)=\"edit($event)\"\n    [value]=\"name\"\n    [attr.maxlength]=\"maxlength\"\n    [attr.placeholder]=\"placeholder\" #editor/>\n<div class=\"autocomplete off\" *ngIf=\"editMode && autocomplete\" #filler>\n  <ul>\n      <li *ngFor=\"let x of fillerList; let i = index\"\n        (click)=\"selectedFiller = i\"\n        [class.selected]=\"selectedFiller === i\"\n        [textContent]=\"x\"></li>\n  </ul>\n</div>\n<span\n    *ngIf=\"!editMode\"\n    class=\"holder\"\n    [innerHTML]=\"placeholder ? placeholder : formattedName()\"></span>\n<span\n    *ngIf=\"!editMode && removable\"\n    tabindex=\"0\"\n    class=\"remove fa fa-times\"\n    (click)=\"remove()\"></span>\n<span\n    *ngIf=\"!removable\"\n    class=\"placeholder fa fa-plus-circle\"></span>",
-                styles: [":host{\n  cursor:pointer;\n  color:#fdfdfd;\n  margin:4px 2px;\n  display:inline-block;\n  background-color:#1F84AB;\n  border:1px solid #015E85;\n  border-radius:8px 20px 20px 8px;\n  -webkit-box-sizing:border-box;\n          box-sizing:border-box;\n  padding:3px 0;\n  position:relative; }\n  :host ::ng-deep img{\n    width:50px; }\n  :host.left-padded{\n    padding-left:8px; }\n  :host.drag-over:hover{\n    background-color:#add8e6;\n    cursor:move; }\n  :host[placeholder]{\n    background-color:transparent;\n    color:#000;\n    border:0; }\n    :host[placeholder]:hover{\n      background-color:#eee !important; }\n    :host[placeholder] .editor{\n      color:#000; }\n  :host:hover{\n    background-color:#027912 !important;\n    border-color:#024b0b !important; }\n  :host.focused{\n    background-color:#027912 !important;\n    border-color:#024b0b !important; }\n  :host.selected:hover{\n    background-color:#D6534E; }\n  :host.selected{\n    background-color:#D6534E; }\n    :host.selected .selection.fa:before{\n      content:\"\\f00c\" !important; }\n  :host .selection{\n    background-color:transparent;\n    float:left;\n    margin-right:3px;\n    padding:0;\n    width:10px;\n    height:10px;\n    font-size:0.8rem;\n    padding:5px 3px; }\n    :host .selection.fa:before{\n      content:\"\\f013\"; }\n  :host .editor{\n    background-color:transparent;\n    overflow:unset;\n    max-width:inherit;\n    width:inherit;\n    color:#fff;\n    border:none; }\n  :host .placeholder{\n    color:#888585;\n    float:right;\n    font-size:1rem;\n    height:20px;\n    line-height:20px;\n    margin-left:5px;\n    text-align:center;\n    width:20px; }\n  :host .remove{\n    float:right;\n    font-size:0.7rem;\n    height:20px;\n    width:20px;\n    color:#fff;\n    text-align:center;\n    margin-left:5px;\n    line-height:20px;\n    font-weight:bolder; }\n  :host .holder{\n    pointer-events:none;\n    -webkit-user-select:none;\n    -moz-user-select:none;\n    -ms-user-select:none;\n    user-select:none; }\n  :host .autocomplete{\n    position:absolute;\n    top:26px;\n    z-index:5; }\n    :host .autocomplete.off{\n      display:none; }\n    :host .autocomplete ul{\n      border:1px solid #024b0b;\n      border-top:0;\n      list-style:none;\n      background-color:#027912;\n      list-style-position:inside;\n      margin:0;\n      max-height:150px;\n      overflow-y:auto;\n      padding:0; }\n      :host .autocomplete ul li{\n        color:#fdfdfd;\n        padding:5px;\n        white-space:nowrap; }\n        :host .autocomplete ul li.selected{\n          background-color:#D6534E; }\n        :host .autocomplete ul li:hover{\n          background-color:#0446a8;\n          color:#fff; }\n"],
+                styles: [":host{\n  cursor:pointer;\n  color:#fdfdfd;\n  margin:4px 2px;\n  display:inline-block;\n  background-color:#1F84AB;\n  border:1px solid #015E85;\n  border-radius:8px 20px 20px 8px;\n  -webkit-box-sizing:border-box;\n          box-sizing:border-box;\n  padding:3px 0;\n  position:relative; }\n  :host ::ng-deep img{\n    height:25px; }\n  :host.left-padded{\n    padding-left:8px; }\n  :host.drag-over{\n    background-color:#add8e6 !important;\n    cursor:move; }\n  :host[placeholder]{\n    background-color:transparent;\n    color:#000;\n    border:0; }\n    :host[placeholder]:hover{\n      background-color:#eee !important; }\n    :host[placeholder] .editor{\n      color:#000; }\n  :host:hover{\n    background-color:#027912 !important;\n    border-color:#024b0b !important; }\n  :host.focused{\n    background-color:#027912 !important;\n    border-color:#024b0b !important; }\n  :host.selected:hover{\n    background-color:#D6534E; }\n  :host.selected{\n    background-color:#D6534E; }\n    :host.selected .selection.fa:before{\n      content:\"\\f00c\" !important; }\n  :host .selection{\n    background-color:transparent;\n    float:left;\n    margin-right:3px;\n    padding:0;\n    width:10px;\n    height:10px;\n    font-size:0.8rem;\n    padding:5px 3px; }\n    :host .selection.fa:before{\n      content:\"\\f013\"; }\n  :host .editor{\n    background-color:transparent;\n    overflow:unset;\n    max-width:inherit;\n    width:inherit;\n    color:#fff;\n    border:none; }\n  :host .placeholder{\n    color:#888585;\n    float:right;\n    font-size:1rem;\n    height:20px;\n    line-height:20px;\n    margin-left:5px;\n    text-align:center;\n    width:20px; }\n  :host .remove{\n    float:right;\n    font-size:0.7rem;\n    height:20px;\n    width:20px;\n    color:#fff;\n    text-align:center;\n    margin-left:5px;\n    line-height:20px;\n    font-weight:bolder; }\n  :host .holder{\n    pointer-events:none;\n    -webkit-user-select:none;\n    -moz-user-select:none;\n    -ms-user-select:none;\n    user-select:none; }\n  :host .autocomplete{\n    position:absolute;\n    top:26px;\n    z-index:5; }\n    :host .autocomplete.off{\n      display:none; }\n    :host .autocomplete ul{\n      border:1px solid #024b0b;\n      border-top:0;\n      list-style:none;\n      background-color:#027912;\n      list-style-position:inside;\n      margin:0;\n      max-height:150px;\n      overflow-y:auto;\n      padding:0; }\n      :host .autocomplete ul li{\n        color:#fdfdfd;\n        padding:5px;\n        white-space:nowrap; }\n        :host .autocomplete ul li.selected{\n          background-color:#D6534E; }\n        :host .autocomplete ul li:hover{\n          background-color:#0446a8;\n          color:#fff; }\n"],
             },] },
 ];
 TagComponent.ctorParameters = function () { return [
+    { type: TagTransfer, },
     { type: intoPipes.InToPipe, },
     { type: core.ElementRef, },
     { type: core.Renderer, },
@@ -531,6 +622,7 @@ TagComponent.propDecorators = {
     "maxlength": [{ type: core.Input, args: ["maxlength",] },],
     "name": [{ type: core.Input, args: ["name",] },],
     "placeholder": [{ type: core.Input, args: ["placeholder",] },],
+    "parent": [{ type: core.Input, args: ["parent",] },],
     "autocomplete": [{ type: core.Input, args: ["autocomplete",] },],
     "selectionpolicy": [{ type: core.Input, args: ["selectionpolicy",] },],
     "editpolicy": [{ type: core.Input, args: ["editpolicy",] },],
@@ -568,7 +660,9 @@ TagBoxModule.decorators = [
                     TagBoxComponent
                 ],
                 entryComponents: [],
-                providers: [],
+                providers: [
+                    TagTransfer
+                ],
                 schemas: [core.CUSTOM_ELEMENTS_SCHEMA]
             },] },
 ];
@@ -580,6 +674,7 @@ exports.EditPolicy = EditPolicy;
 exports.Selectionpolicy = Selectionpolicy;
 exports.TagBoxModule = TagBoxModule;
 exports.ɵa = TagComponent;
+exports.ɵb = TagTransfer;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 

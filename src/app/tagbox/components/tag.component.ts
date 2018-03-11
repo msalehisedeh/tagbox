@@ -15,13 +15,15 @@ import {
   EventEmitter
 } from '@angular/core';
 
+import { InToPipe } from 'into-pipes';
+
 import {
   DragDropPolicy,
   Selectionpolicy,
   EditPolicy
 } from '../interfaces/tagbox.interfaces';
 
-import { InToPipe } from 'into-pipes';
+import { TagTransfer } from './tag.transfer';
 
 @Component({
   selector: 'tag',
@@ -68,6 +70,9 @@ export class TagComponent implements OnInit {
   @Input("placeholder")
   placeholder: boolean;
 
+  @Input("parent")
+  parent: any;
+
   @Input("autocomplete")
   autocomplete: string[];
 
@@ -90,6 +95,7 @@ export class TagComponent implements OnInit {
   filler;
 
   constructor(
+    private dataTransfer: TagTransfer,
     private into: InToPipe,
     public el: ElementRef, 
     private renderer: Renderer
@@ -105,7 +111,8 @@ export class TagComponent implements OnInit {
   dragStart(event) {
       event.stopPropagation();	
       if (this.allowDrag()) {
-          event.dataTransfer.setData("source",this.name);
+        event.dataTransfer.setData("source",this.name); // this is needed to get the darg/drop going..
+        this.dataTransfer.setData("source",this); // this is needed because event data transfer takes string not bject
       }
   }
   @HostListener('drag', ['$event']) 
@@ -122,8 +129,8 @@ export class TagComponent implements OnInit {
     event.preventDefault();
     this.renderer.setElementClass(this.el.nativeElement, "drag-over", false);
     this.ondrop.emit({
-      source: event.dataTransfer.getData("source"),
-      destination: this.name
+      source: this.dataTransfer.getData("source"),
+      destination: this
     })
   }
   
@@ -155,9 +162,9 @@ export class TagComponent implements OnInit {
   }
   
   allowDrop(event): boolean {
-      const source = event.dataTransfer.getData("source");
+      const source = this.dataTransfer.getData("source");
 
-      return (source && source != this.name) && this.name && this.name.length > 0;
+      return (source && source.name != this.name) && this.name && this.name.length > 0;
   }
 
   allowDrag() : boolean {

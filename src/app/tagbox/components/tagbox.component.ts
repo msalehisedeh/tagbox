@@ -4,6 +4,7 @@
  */
 import {
   Component,
+  ChangeDetectionStrategy,
   OnInit,
   OnChanges,
   Input,
@@ -22,6 +23,7 @@ import {
 import { TagComponent } from './tag.component';
 
 @Component({
+  // changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'tagbox',
   templateUrl: './tagbox.component.html',
   styleUrls: ['./tagbox.component.scss'],
@@ -33,6 +35,9 @@ export class TagBoxComponent implements OnInit, OnChanges {
   
   @Output("onchange")
   onchange= new EventEmitter()
+
+  @Output("onerror")
+  onerror= new EventEmitter()
 
   @Output("onselect")
   onselect= new EventEmitter()
@@ -57,6 +62,9 @@ export class TagBoxComponent implements OnInit, OnChanges {
 
   @Input("mintags")
   mintags: number;
+
+  @Input("formController")
+  formController: HTMLElement;
 
   @Input("tags")
   tags: any;
@@ -104,7 +112,7 @@ export class TagBoxComponent implements OnInit, OnChanges {
       const x: string = String(this.tags);
       this._tags = x.split(this.delineateby ? this.delineateby : ",");
     } else {
-      this._tags = this.tags;
+      this._tags = this.tags ? this.tags : [];
     }
     this.renderer.setElementAttribute(this.el.nativeElement,"role","list");
   }
@@ -129,30 +137,35 @@ export class TagBoxComponent implements OnInit, OnChanges {
     canRemove = canRemove || (this.editpolicy === EditPolicy.removeOnly);
 
     canRemove = canRemove && (!this.mintags || (this._tags.length > this.mintags));
-    
+
+    if (!canRemove) {
+      this.onerror.emit("Unable to remove tag. Operation is not allowed.");
+    }
     return  canRemove;
   }
 
   private isDuplicate(name) {
-    return this._tags.indexOf(name) < 0 ? false : true;
+    const flag = this._tags.indexOf(name) < 0 ? false : true;
+    if (flag) {
+      this.onerror.emit("Unable to perform operation. Resulting duplicate tags is not allowed.");
+    }
+    return flag;
   }
 
-  allowedToaddItem(tag) {
+  private allowedToaddItem(name) {
     let canAdd = (this.editpolicy === EditPolicy.addAndRemove);
 
     canAdd = canAdd || (this.editpolicy === EditPolicy.addOnly);
 
-    canAdd = canAdd && (!this.maxtags || (this._tags.length < this.maxtags-1));
+    canAdd = canAdd && (!this.maxtags || (this._tags.length < this.maxtags));
 
-    canAdd = canAdd && !this.isDuplicate(tag.name);
+    canAdd = canAdd && !this.isDuplicate(name);
 
     if (canAdd && this.maxtaglength) {
       const x = this._tags.join( this.delineateby ? this.delineateby : ",");
-      if (x.length+tag.name.length+1 >= this.maxboxlength) {
+      if (x.length+name.length+1 >= this.maxboxlength) {
         canAdd = false;
-        this.renderer.setElementClass(this.el.nativeElement, "alert", true);
-      } else {
-        this.renderer.setElementClass(this.el.nativeElement, "alert", false);
+        this.onerror.emit("Unable to add tag. Resulting content will exceed maxtaglength.");
       }
     }    
     return  canAdd;
@@ -166,7 +179,8 @@ export class TagBoxComponent implements OnInit, OnChanges {
     this.onchange.emit({
       id: this.id,
       tags: this.tags,
-      selecedIndex: this.selectedindex
+      selecedIndex: this.selectedindex,
+      formController: this.formController
     });
   }
   private notifySelection() {
@@ -175,12 +189,49 @@ export class TagBoxComponent implements OnInit, OnChanges {
                         (this._selectedindex.length ? this._selectedindex.join(",") : "");
     this.onselect.emit({
       id: this.id,
-      selecedIndex: this.selectedindex
+      selecedIndex: this.selectedindex,
+      formController: this.formController
     });
   }
-  onTagRemove(event: TagComponent) {
-    if (this.isRemovable() && this.beforeAction({request:"remove", item: event.name})) {
-      const index = this._tags.indexOf(event.name);
+  private createDropRequest(action, source, destination) {
+    return {
+      request: "drop",
+      action: action,
+      source: {
+        id: source.parent.id,
+        name: source.name
+      },
+      destination: {
+        id: destination.parent.id,
+        name: destination.name
+      }
+    }
+  }
+  private prependTagAt(index, source, destination) {
+    let result = false;
+    const newName = source.name  + " " + this._tags[index];
+    if (!this.maxtaglength ||  (this.maxtaglength && source.name.length <= this.maxtaglength)) {
+      if (this.beforeAction(this.createDropRequest("prepend", source, destination))) {
+        this._tags[index] = newName;
+        result = true;
+      }
+    }
+    return result;
+  }
+  private appendTagAt(index, source, destination) {
+    let result = false;
+    const newName = this._tags[index] + " " + source.name;
+    if (!this.maxtaglength ||  (this.maxtaglength && source.name.length <= this.maxtaglength)) {
+      if (this.beforeAction(this.createDropRequest("append", source, destination))) {
+        this._tags[index] = newName;
+        result = true;
+      }
+    }
+    return result;
+  }
+  removeTagWithName(name) {
+    if (this.isRemovable() && this.beforeAction({request:"remove", item: name})) {
+      const index = this._tags.indexOf(name);
       const i = this._selectedindex.indexOf(index);
 
       this._tags.splice(index,1);
@@ -190,18 +241,28 @@ export class TagBoxComponent implements OnInit, OnChanges {
       }
     }
   }
-
-  onTagAdd(event: TagComponent) {
-    let index = this._tags.indexOf(event.name);
+  addTagWithName(name) {
+    let index = this._tags.indexOf(name);
     const i = this._selectedindex.indexOf(index);
     
     if (index < 0  && 
-        event.name.length && 
-        this.allowedToaddItem(event) && 
-        this.beforeAction({request:"add", item: event.name})) {
-      this._tags.push(event.name);
-      event.name = "";
+        name.length && 
+        this.allowedToaddItem(name) && 
+        this.beforeAction({request:"add", item: name})) {
+      this._tags.push(name);
       this.notifyChange();
+      return true;
+    } else {
+      return false;
+    }
+  }
+  onTagRemove(event: TagComponent) {
+    this.removeTagWithName(event.name);
+  }
+
+  onTagAdd(event: TagComponent) {
+    if (this.addTagWithName(event.name)) {
+      event.name = "";
       event.click(null);
     } else {
       event.reset();
@@ -221,35 +282,48 @@ export class TagBoxComponent implements OnInit, OnChanges {
   }
 
   onTagDrop(event) {
-    const sind = this._tags.indexOf(event.source);
-    const dind = this._tags.indexOf(event.destination);
+    const sind = this._tags.indexOf(event.source.name);
+    const dind = this._tags.indexOf(event.destination.name);
 
     if (this.dragpolicy === DragDropPolicy.appendOnDrop) {
-      const i = this._selectedindex.indexOf(sind);
-      const name = event.destination + " " + event.source;
-      if (!this.maxtaglength ||  (this.maxtaglength && name.length <= this.maxtaglength)) {
-        if (this.beforeAction({request:"drop", action: "append", source: event.source, destination: event.destination})) {
-          this._tags[dind] = name;
+      if (event.source.parent.id === event.destination.parent.id) {
+        if (this.appendTagAt(dind, event.source, event.destination)) {
+          const i = this._selectedindex.indexOf(sind);
           this._tags.splice(sind,1);
           this._selectedindex.splice(i,1);
           this.notifyChange();
+        }
+      } else {
+        if (this.appendTagAt(dind, event.source, event.destination)) {
+          this.notifyChange();
+          event.source.parent.removeTagWithName(event.source.name);
         }
       }
     } else if (this.dragpolicy === DragDropPolicy.prependOnDrop) {
-      const i = this._selectedindex.indexOf(sind);
-      const name = event.source + " " + event.destination;
-      if (!this.maxtaglength ||  (this.maxtaglength && name.length <= this.maxtaglength)) {
-        if (this.beforeAction({request:"drop", action: "prepend", source: event.source, destination: event.destination})) {
-          this._tags[dind] = name;
+      if (event.source.parent.id === event.destination.parent.id) {
+        if (this.prependTagAt(dind, event.source, event.destination)) {
+          const i = this._selectedindex.indexOf(sind);
           this._tags.splice(sind,1);
           this._selectedindex.splice(i,1);
           this.notifyChange();
         }
+      } else {
+        if (this.prependTagAt(dind, event.source, event.destination)) {
+          this.notifyChange();
+          event.source.parent.removeTagWithName(event.source.name);
+        }
       }
     } if (this.dragpolicy === DragDropPolicy.swapOnDrop) {
-      if (this.beforeAction({request:"drop", action: "swap", source: event.source, destination: event.destination})) {
-        this._tags[sind] = this._tags.splice(dind, 1, this._tags[sind])[0];
-        this.notifyChange();
+      if (this.beforeAction(this.createDropRequest("swap", event.source, event.destination))) {
+        if (event.source.parent.id === event.destination.parent.id) {
+          this._tags[sind] = this._tags.splice(dind, 1, this._tags[sind])[0];
+          this.notifyChange();
+        } else {
+          if (this.addTagWithName(event.source.name)) {
+            this.removeTagWithName(event.destination.name);
+            event.source.parent.removeTagWithName(event.source.name);
+          }
+        }
       }
     } 
   }

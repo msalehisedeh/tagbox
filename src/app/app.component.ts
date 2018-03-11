@@ -33,6 +33,9 @@ export class AppComponent {
 
   }
 
+  showError(event) {
+    this.events.push(event);
+  }
   evaluateAction(event) {
     this.events.push(event);
     return true;
