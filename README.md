@@ -10,7 +10,7 @@ The following are available functionalities presented in this version.
 ```
 DEPENDENCIES: 
 	"font-awesome": "^4.7.0", 
-	"into-pipes": "^0.0.0"
+	"into-pipes": "^0.1.0"
 ```
 
 ## Drag and Drop between tag boxes.
