@@ -3,6 +3,17 @@
 Have you ever been in need of a tag box that can provide many built in functionalities that suites you needs? TagBox is built with Angular 4+ code and is developed specifically without needing to use ngModel to avoid an existing bug in Angular which makes any program non-responsive if any component that uses ngModel is used within a template.  In Addition TagBox enhances bugs that are exists in other tag Angular libraries.  This code is created instead of making change request in other libraries because it is drastically enhancing issues found and may be incompatible for use for those who are already using them.
 
 
+[Live Demo](https://tagbox.stackblitz.io) | [Source code](https://github.com/msalehisedeh/tagbox)
+
+
+# Version 0.1.1
+Now you can tag a video!!
+```
+DEPENDENCIES: 
+	"font-awesome": "^4.7.0", 
+	"into-pipes": "^1.3.3"
+```
+
 # Version 0.1.0
 
 The following are available functionalities presented in this version. 
@@ -176,6 +187,3 @@ updateTag(event) {
 ```
 
 ![alt text](https://raw.githubusercontent.com/msalehisedeh/tagbox/master/sample.png  "What you would see when a tagbox is used")
-
-[Source code](https://github.com/msalehisedeh/tagbox)
-
