@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import { TagBoxModule } from './tagbox/tagbox.module';
@@ -9,6 +10,7 @@ import { TagBoxModule } from './tagbox/tagbox.module';
     AppComponent
   ],
   imports: [
+	BrowserModule,
     TagBoxModule
   ],
   providers: [

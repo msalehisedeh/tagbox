@@ -6,6 +6,10 @@ Have you ever been in need of a tag box that can provide many built in functiona
 [Live Demo](https://tagbox.stackblitz.io) | [Source code](https://github.com/msalehisedeh/tagbox) | [Comments/Requests](https://github.com/msalehisedeh/tagbox/issues)
 
 
+# Version 1.0.0
+Compiled with AOT option and resolved issues.
+
+
 # Version 0.1.1
 Now you can tag a video!!
 ```

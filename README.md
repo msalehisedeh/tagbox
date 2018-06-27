@@ -3,7 +3,11 @@
 Have you ever been in need of a tag box that can provide many built in functionalities that suites you needs? TagBox is built with Angular 4+ code and is developed specifically without needing to use ngModel to avoid an existing bug in Angular which makes any program non-responsive if any component that uses ngModel is used within a template.  In Addition TagBox enhances bugs that are exists in other tag Angular libraries.  This code is created instead of making change request in other libraries because it is drastically enhancing issues found and may be incompatible for use for those who are already using them.
 
 
-[Live Demo](https://tagbox.stackblitz.io) | [Source code](https://github.com/msalehisedeh/tagbox)
+[Live Demo](https://tagbox.stackblitz.io) | [Source code](https://github.com/msalehisedeh/tagbox) | [Comments/Requests](https://github.com/msalehisedeh/tagbox/issues)
+
+
+# Version 1.0.0
+Compiled with AOT option and resolved issues.
 
 
 # Version 0.1.1
