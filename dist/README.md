@@ -6,6 +6,9 @@ Have you ever been in need of a tag box that can provide many built in functiona
 
 [Live Demo](https://tagbox.stackblitz.io) | [Source code](https://github.com/msalehisedeh/tagbox/tree/master/src/app) | [Comments/Requests](https://github.com/msalehisedeh/tagbox/issues)
 
+# Version 1.2.0
+It was brought to my attention that some users have trouble using my components in their angular 6 environment. Since I had only updated few dependencies when moved to Angular 6, I am thinking dependencies are causing issues. So, for this release, I am updating all dependencies to what Angular 6 applications are expecting to have. Please let me know if this is fixing or not fixing any issues you are facing.
+
 # Version 1.1.2
 rolling to angular 6+ after fixing the dependency issue.
 

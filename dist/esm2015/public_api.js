@@ -1,0 +1,9 @@
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
+ */
+export { TagBoxComponent } from './src/app/tagbox/components/tagbox.component';
+export { DragDropPolicy, EditPolicy, Selectionpolicy } from './src/app/tagbox/interfaces/tagbox.interfaces';
+export { TagBoxModule } from './src/app/tagbox/tagbox.module';
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicHVibGljX2FwaS5qcyIsInNvdXJjZVJvb3QiOiJuZzovL3RhZ2JveC8iLCJzb3VyY2VzIjpbInB1YmxpY19hcGkudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7OztBQUFBLE9BQU8sRUFBRSxlQUFlLEVBQUUsTUFBTSw4Q0FBOEMsQ0FBQztBQUMvRSxPQUFPLEVBQUUsY0FBYyxFQUFFLFVBQVUsRUFBRSxlQUFlLEVBQUUsTUFBTSwrQ0FBK0MsQ0FBQztBQUM1RyxPQUFPLEVBQUUsWUFBWSxFQUFFLE1BQU0sZ0NBQWdDLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgeyBUYWdCb3hDb21wb25lbnQgfSBmcm9tICcuL3NyYy9hcHAvdGFnYm94L2NvbXBvbmVudHMvdGFnYm94LmNvbXBvbmVudCc7XHJcbmV4cG9ydCB7IERyYWdEcm9wUG9saWN5LCBFZGl0UG9saWN5LCBTZWxlY3Rpb25wb2xpY3kgfSBmcm9tICcuL3NyYy9hcHAvdGFnYm94L2ludGVyZmFjZXMvdGFnYm94LmludGVyZmFjZXMnO1xyXG5leHBvcnQgeyBUYWdCb3hNb2R1bGUgfSBmcm9tICcuL3NyYy9hcHAvdGFnYm94L3RhZ2JveC5tb2R1bGUnO1xyXG4iXX0=

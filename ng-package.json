@@ -7,6 +7,7 @@
     "angular",
     "zone",
     "font-awesome",
+	"into-pipes",
 	"drag-enabled",
     "core-js"
   ]
