@@ -1,5 +1,5 @@
 import { OnInit, ElementRef, Renderer, EventEmitter } from '@angular/core';
-import { InToPipe } from 'into-pipes';
+import { InToPipe } from '@sedeh/into-pipes';
 import { DragDropPolicy, Selectionpolicy, EditPolicy } from '../interfaces/tagbox.interfaces';
 import { TagTransfer } from './tag.transfer';
 export declare class TagComponent implements OnInit {

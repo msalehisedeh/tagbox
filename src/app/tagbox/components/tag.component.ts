@@ -15,7 +15,7 @@ import {
   EventEmitter
 } from '@angular/core';
 
-import { InToPipe } from 'into-pipes';
+import { InToPipe } from '@sedeh/into-pipes';
 
 import {
   DragDropPolicy,
