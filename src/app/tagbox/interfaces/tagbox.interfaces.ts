@@ -9,7 +9,8 @@ export enum EditPolicy {
   viewOnly = 1,
   addOnly = 2,
   removeOnly = 4,
-  addAndRemove = 6
+  addAndRemove = 6,
+  addRemoveModify = 7
 }
 export enum Selectionpolicy {
   disabled = 1,

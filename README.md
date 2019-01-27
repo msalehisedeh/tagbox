@@ -83,13 +83,34 @@ We are using "into-pipes" library. to find out what formatting options are avail
 
 **Selection Policy** allows you to decide if user click on a tag can result in a multi selection or single selection of tags, or if you want the tag selection is disabled entirely. Enabled or not, a selected index list of selected tags will be available for use by other parts of your code. if single selection is allowed, only one tag is returned back to you after modifications.
 
+```javascript
+  disabled     // disable selection
+  multiSelect  // allow selection of multipple tags
+  singleSelect // only one tag at a time should be selected
+```
+
 #### Drag/Drop Policy
 
 **DragDrop Policy** allows you to decide if dragging and dropping a tag is possible and if it can lead to swapping tags, or appending or prepending the content of dragged tag in to the drop destination tag.
 
+```javascript
+  disabled      // drag drop not allowed
+  appendOnDrop  // append source to destination
+  prependOnDrop // prepend source into destination
+  swapOnDrop    // swap the tags
+```
+
 #### Edit Policy
 
 **Edit Policy** allows you to decide if the tag box is disabled, or if user is allowed to add or delete tags from the box, or edit existing tags. Enabled or not, a list of tags will be available for use by other parts of your code.  If you supply the list of existing tags in a string, the list will be given back to you as a string. If the supplied list is an object, after any modifications, the resulting object will be given back to you in return.
+
+```javascript
+  viewOnly        //box is locked down.
+  addOnly         //allow add new tag
+  removeOnly      //allow remove existing tag
+  addAndRemove    //allow add new tag or remove existing tag
+  addRemoveModify //allow add new tag, remove existing tag, or edit a tag
+```
 
 #### Placeholder Text
 
@@ -161,6 +182,7 @@ updateTag(event) {
 
 | Version | Description                                                                                              |
 |---------|----------------------------------------------------------------------------------------------------------|
+| 1.2.2   | Fixed ADA issues. Updated edit policy. Now in order to allow updating a tag, edit policy should be addRemoveEdit. Modified drag drop behavior. If dropping over another tag box both should have the same format option. |
 | 1.2.1   | Updated dependencies.                                                                                    |
 | 1.2.0   | It was brought to my attention that some users have trouble using my components in their angular 6 environment. Since I had only updated few dependencies when moved to Angular 6, I am thinking dependencies are causing issues. So, for this release, I am updating all dependencies to what Angular 6 applications are expecting to have. Please let me know if this is fixing or not fixing any issues you are facing. |
 | 1.1.2   | Rolling to angular 6+ after fixing the dependency issue.                                                 |

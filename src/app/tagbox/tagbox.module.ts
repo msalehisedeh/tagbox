@@ -11,7 +11,7 @@ import { TagTransfer } from './components/tag.transfer';
   imports: [
     CommonModule,
     IntoPipeModule,
-	DragDropModule
+    DragDropModule
   ],
   declarations: [
     TagBoxComponent,

@@ -134,6 +134,7 @@ export class TagBoxComponent implements OnInit, OnChanges {
   isRemovable() {
     let canRemove = (this.editpolicy === EditPolicy.addAndRemove);
 
+    canRemove = canRemove || (this.editpolicy === EditPolicy.addRemoveModify);
     canRemove = canRemove || (this.editpolicy === EditPolicy.removeOnly);
 
     canRemove = canRemove && (!this.mintags || (this._tags.length > this.mintags));
@@ -155,6 +156,7 @@ export class TagBoxComponent implements OnInit, OnChanges {
   private allowedToaddItem(name) {
     let canAdd = (this.editpolicy === EditPolicy.addAndRemove);
 
+    canAdd = canAdd || (this.editpolicy === EditPolicy.addRemoveModify);
     canAdd = canAdd || (this.editpolicy === EditPolicy.addOnly);
 
     canAdd = canAdd && (!this.maxtags || (this._tags.length < this.maxtags));
@@ -231,13 +233,17 @@ export class TagBoxComponent implements OnInit, OnChanges {
   }
   removeTagWithName(name) {
     if (this.isRemovable() && this.beforeAction({request:"remove", item: name})) {
-      const index = this._tags.indexOf(name);
-      const i = this._selectedindex.indexOf(index);
-
-      this._tags.splice(index,1);
-      if (i >= 0) {
-        this._selectedindex.splice(i,1);
-        this.notifyChange();
+      if (this._selectedindex instanceof Array) {
+        const index = this._tags.indexOf(name);
+        const i = this._selectedindex.indexOf(index);
+  
+        this._tags.splice(index,1);
+        if (i >= 0) {
+          this._selectedindex.splice(i,1);
+          this.notifyChange();
+        }
+      } else {
+        this._selectedindex = [];
       }
     }
   }

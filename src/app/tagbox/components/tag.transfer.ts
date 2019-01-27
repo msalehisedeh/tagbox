@@ -1,4 +1,4 @@
-import { Injectable, Inject  } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 @Injectable()
 export class TagTransfer {
@@ -7,11 +7,11 @@ export class TagTransfer {
 
     constructor() {}
 
-    setData(name, value){
+    setData(name: string, value: any){
         this.data[name] = value;
     }
 
-    getData(name) {
+    getData(name: string) {
         return this.data[name];
     }
             

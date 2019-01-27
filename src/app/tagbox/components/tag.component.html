@@ -20,9 +20,9 @@
         [textContent]="x"></li>
   </ul>
 </div>
-<span 
+<span #holder
     *ngIf="!editMode" 
-    class="holder" 
+    [tabindex]="isEditable() ? 0 : -1" 
     [innerHTML]="placeholder ? placeholder : formattedName()"></span>
 <span 
     *ngIf="!editMode && removable" 

@@ -91,6 +91,9 @@ export class TagComponent implements OnInit {
   @ViewChild("selector")
   selector;
 
+  @ViewChild("holder")
+  holder;
+
   @ViewChild("filler")
   filler;
 
@@ -108,7 +111,7 @@ export class TagComponent implements OnInit {
   }
 
   @HostListener('dragstart', ['$event']) 
-  dragStart(event) {
+  dragStart(event: any) {
       event.stopPropagation();	
       if (this.allowDrag()) {
         event.dataTransfer.setData("source",this.name); // this is needed to get the darg/drop going..
@@ -116,16 +119,16 @@ export class TagComponent implements OnInit {
       }
   }
   @HostListener('drag', ['$event']) 
-  drag(event) {}
+  drag(event: any) {}
   
   @HostListener('dragend', ['$event']) 
-  dragEnd(event) {
+  dragEnd(event: any) {
       event.stopPropagation();	
 
       this.renderer.setElementClass(this.el.nativeElement, "drag-over", false);
   }
   @HostListener('drop', ['$event'])
-  drop(event) {
+  drop(event: any) {
     event.preventDefault();
     this.renderer.setElementClass(this.el.nativeElement, "drag-over", false);
     this.ondrop.emit({
@@ -135,7 +138,7 @@ export class TagComponent implements OnInit {
   }
   
   @HostListener('dragenter', ['$event']) 
-  dragEnter(event) {
+  dragEnter(event: any) {
       event.preventDefault();
       if (this.allowDrop(event)) {
           this.renderer.setElementClass(this.el.nativeElement, "drag-over", true);
@@ -145,14 +148,14 @@ export class TagComponent implements OnInit {
   }
   
   @HostListener('dragleave', ['$event']) 
-  dragLeave(event) {
+  dragLeave(event: any) {
       event.preventDefault();
               
       this.renderer.setElementClass(this.el.nativeElement, "drag-over", false);
   }
   
   @HostListener('dragover', ['$event']) 
-  dragOver(event) {
+  dragOver(event: any) {
       if (this.allowDrop(event)) {
           event.preventDefault();
           this.renderer.setElementClass(this.el.nativeElement, "drag-over", true);
@@ -161,10 +164,12 @@ export class TagComponent implements OnInit {
       }
   }
   
-  allowDrop(event): boolean {
+  allowDrop(event: any): boolean {
       const source = this.dataTransfer.getData("source");
-
-      return (source && source.name != this.name) && this.name && this.name.length > 0;
+      const allow = (source && source.name != this.name) && 
+                    (this.name && this.name.length > 0) &&
+                    ((!source.format && !this.format) || source.format == this.format);
+      return allow;
   }
 
   allowDrag() : boolean {
@@ -172,7 +177,7 @@ export class TagComponent implements OnInit {
   }
 
   @HostListener('keyup', ['$event']) 
-  keyup(event) {
+  keyup(event: any) {
     if (event.target === this.el.nativeElement ||
        (this.editor && event.target === this.editor.nativeElement)) {
       const code = event.which;
@@ -211,6 +216,12 @@ export class TagComponent implements OnInit {
           this.onselect.emit(this)
         }
       }
+    } else  if (this.holder && event.target === this.holder.nativeElement) {
+      const code = event.which;
+      if (code === 13) { // cariage return
+        this.editMode = true;
+        setTimeout(()=>this.editor.nativeElement.focus(),33);
+      }      
     } else {
       const code = event.which;
       if (code === 13) { // cariage return
@@ -220,7 +231,7 @@ export class TagComponent implements OnInit {
   }
 
   @HostListener('click', ['$event']) 
-  click(event) {
+  click(event: Event) {
     if (this.selector && event.target === this.selector.nativeElement) {
       if (this.isSelectable()) {
         this.onselect.emit(this)
@@ -257,7 +268,7 @@ export class TagComponent implements OnInit {
   }
 
   @HostListener('focus', ['$event']) 
-  focus(event) {
+  focus(event: any) {
     if (this.isSelectable()) {
       this.onfocus.emit(this)
     }
@@ -266,13 +277,14 @@ export class TagComponent implements OnInit {
   isRemovable() {
     let canRemove = (this.editpolicy === EditPolicy.addAndRemove);
 
+    canRemove = canRemove || (this.editpolicy === EditPolicy.addRemoveModify);
     canRemove = canRemove || (this.editpolicy === EditPolicy.removeOnly);
     
     return  canRemove;
   }
 
   isEditable() {
-    return  (this.editpolicy !== EditPolicy.viewOnly);
+    return  (this.editpolicy === EditPolicy.addRemoveModify);
   }
 
   isDraggable() {
@@ -286,7 +298,7 @@ export class TagComponent implements OnInit {
     
   }
 
-  tabout(event) {
+  tabout(event: any) {
     setTimeout(() => {
       this.name = this.selectedFiller < 0 ? event.target.value : this.fillerList[this.selectedFiller];
       this.editMode = false;
@@ -297,7 +309,7 @@ export class TagComponent implements OnInit {
       }
     }, 66)
   }
-  edit(event) {
+  edit(event: any) {
     this.name = event.target.value;
     this.updateFillerList(this.name);
   }

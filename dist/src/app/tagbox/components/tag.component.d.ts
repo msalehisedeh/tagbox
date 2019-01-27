@@ -29,6 +29,7 @@ export declare class TagComponent implements OnInit {
     dragpolicy: DragDropPolicy;
     editor: any;
     selector: any;
+    holder: any;
     filler: any;
     constructor(dataTransfer: TagTransfer, into: InToPipe, el: ElementRef, renderer: Renderer);
     ngOnInit(): void;
@@ -42,7 +43,7 @@ export declare class TagComponent implements OnInit {
     allowDrop(event: any): boolean;
     allowDrag(): boolean;
     keyup(event: any): void;
-    click(event: any): void;
+    click(event: Event): void;
     focus(event: any): void;
     isRemovable(): boolean;
     isEditable(): boolean;

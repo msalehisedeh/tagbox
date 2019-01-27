@@ -4,8 +4,12 @@
     Welcome to {{ title }}!
   </h1>
 </div>
-
-<tagbox 
+<div class="resources">
+    <a href="https://www.npmjs.com/package/@sedeh/tagbox">npm install @sedeh/tagbox</a>
+    <p>Tested On Safari, Chrome, Mozilla, and IE11 browsers.</p>
+</div>
+  
+<tagbox
     id="tag0"
     tabindex="0"
     [tags]="myImageTags"
@@ -14,7 +18,16 @@
     [editpolicy]="myEditPolicy" 
     [dragpolicy]="myDragPolicy"></tagbox>
 
-<tagbox 
+<tagbox
+    id="tag44"
+    tabindex="0"
+    [tags]="myVideoTags"
+    format="video"
+    [selectionpolicy]="mySelectionPolicy"
+    [editpolicy]="myEditPolicy" 
+    [dragpolicy]="myDragPolicy"></tagbox>
+
+<tagbox
     id="tag1"
     maxboxlength="300" 
     maxtaglength="20"
