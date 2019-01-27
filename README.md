@@ -12,7 +12,7 @@ Have you ever been in need of a tag box that can provide many built in functiona
 DEPENDENCIES: 
 	"font-awesome": "^4.7.0", 
     "@sedeh/drag-enabled": "^2.0.1",
-    "@sedeh/into-pipes": "^2.1.1",
+    "@sedeh/into-pipes": "^2.1.2",
 ```
 ## Functionalities
 
