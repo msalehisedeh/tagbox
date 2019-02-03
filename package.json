@@ -1,6 +1,6 @@
 {
   "name": "@sedeh/tagbox",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -24,8 +24,8 @@
   ],
   "dependencies": {
     "font-awesome": "^4.7.0",
-    "@sedeh/drag-enabled": "^2.0.1",
-    "@sedeh/into-pipes": "^2.1.1"
+    "@sedeh/drag-enabled": "^2.1.0",
+    "@sedeh/into-pipes": "^2.2.4"
   },
   "devDependencies": {
     "@angular/common": "^6.0.0",
