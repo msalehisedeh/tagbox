@@ -40,6 +40,7 @@ export declare class TagComponent implements OnInit {
     dragEnter(event: any): void;
     dragLeave(event: any): void;
     dragOver(event: any): void;
+    private isIE();
     allowDrop(event: any): boolean;
     allowDrag(): boolean;
     keyup(event: any): void;

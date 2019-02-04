@@ -11,7 +11,6 @@ Have you ever been in need of a tag box that can provide many built in functiona
 ```
 DEPENDENCIES: 
 	"font-awesome": "^4.7.0", 
-    "@sedeh/drag-enabled": "^2.1.0",
     "@sedeh/into-pipes": "^2.2.4",
 ```
 ## Functionalities
@@ -182,6 +181,8 @@ updateTag(event) {
 
 | Version | Description                                                                                              |
 |---------|----------------------------------------------------------------------------------------------------------|
+| 1.2.5   | Updated dependencies to fix audio tagging!!                                                              |
+| 1.2.4   | Updated dependencies. Now you can tag an audio!!                                                         |
 | 1.2.3   | Updated dependencies to fix IE drag & drop issues.                                                       |
 | 1.2.2   | Fixed ADA issues. Updated edit policy. Now in order to allow updating a tag, edit policy should be addRemoveEdit. Modified drag drop behaviour. If dropping over another tag box both should have the same format option. |
 | 1.2.1   | Updated dependencies.                                                                                    |

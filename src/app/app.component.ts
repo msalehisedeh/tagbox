@@ -15,6 +15,9 @@ export class AppComponent {
   title = 'Tag Box';
   events: string[] = [];
 
+  myAudioTags= [
+    "https://google.github.io/tacotron/publications/tacotron2/demos/gan_or_vae.wav"
+  ];
   myVideoTags= [
     "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
   ];

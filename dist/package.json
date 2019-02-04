@@ -1,6 +1,6 @@
 {
   "name": "@sedeh/tagbox",
-  "version": "1.2.3",
+  "version": "1.2.5",
   "license": "MIT",
   "private": false,
   "keywords": [
@@ -10,15 +10,15 @@
     "tagging",
     "tokenize",
     "tokenizer",
-    "autocomplete",
     "widget",
+    "autocomplete tagger",
     "image tagger",
+    "audio tagger",
     "video tagger"
   ],
   "dependencies": {
     "font-awesome": "^4.7.0",
-    "@sedeh/drag-enabled": "^2.1.0",
-    "@sedeh/into-pipes": "^2.2.4",
+    "@sedeh/into-pipes": "^2.2.5",
     "tslib": "^1.9.0"
   },
   "devDependencies": {

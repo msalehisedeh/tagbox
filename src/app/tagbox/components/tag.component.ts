@@ -114,7 +114,9 @@ export class TagComponent implements OnInit {
   dragStart(event: any) {
       event.stopPropagation();	
       if (this.allowDrag()) {
-        event.dataTransfer.setData("source",this.name); // this is needed to get the darg/drop going..
+        if (!this.isIE()) {
+          event.dataTransfer.setData("source",this.name); // this is needed to get the darg/drop going..
+        }
         this.dataTransfer.setData("source",this); // this is needed because event data transfer takes string not bject
       }
   }
@@ -136,7 +138,6 @@ export class TagComponent implements OnInit {
       destination: this
     })
   }
-  
   @HostListener('dragenter', ['$event']) 
   dragEnter(event: any) {
       event.preventDefault();
@@ -146,14 +147,12 @@ export class TagComponent implements OnInit {
           this.renderer.setElementClass(this.el.nativeElement, "drag-over", false);
       }
   }
-  
   @HostListener('dragleave', ['$event']) 
   dragLeave(event: any) {
       event.preventDefault();
               
       this.renderer.setElementClass(this.el.nativeElement, "drag-over", false);
   }
-  
   @HostListener('dragover', ['$event']) 
   dragOver(event: any) {
       if (this.allowDrop(event)) {
@@ -163,7 +162,15 @@ export class TagComponent implements OnInit {
           this.renderer.setElementClass(this.el.nativeElement, "drag-over", false);
       }
   }
-  
+  private isIE() {
+    const match = navigator.userAgent.search(/(?:Edge|MSIE|Trident\/.*; rv:)/);
+    let isIE = false;
+
+    if (match !== -1) {
+        isIE = true;
+    }
+    return isIE;
+  }
   allowDrop(event: any): boolean {
       const source = this.dataTransfer.getData("source");
       const allow = (source && source.name != this.name) && 
