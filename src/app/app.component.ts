@@ -41,8 +41,8 @@ export class AppComponent {
   constructor(
     private taggerService: TaggerService
   ) {
-    this.myImageTags.map((item) => this.taggerService.updateTag('immage-box', true, item));
-    this.myVideoTags.map((item) => this.taggerService.updateTag('video-box', true, item));
+    this.taggerService.setTaggedItems('immage-box', this.myImageTags);
+    this.taggerService.setTaggedItems('video-box', this.myVideoTags);
   }
 
   showError(event: any) {
