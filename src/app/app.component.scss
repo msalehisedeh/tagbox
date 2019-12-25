@@ -18,4 +18,12 @@
   color: #551234;
     font-weight: bold;
 }
+.tagger-list {
+    display: flex;
+    flex-direction: row;
+    list-style-type: none;
+    li {
+        margin: 0 10px 0 0;
+    }
+}
   

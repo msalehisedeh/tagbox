@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import {IntoPipeModule } from '@sedeh/into-pipes';
+import { TaggerModule } from '@sedeh/tagger';
 
 import { AppComponent } from './app.component';
 import { TagBoxModule } from './tagbox/tagbox.module';
@@ -10,7 +12,9 @@ import { TagBoxModule } from './tagbox/tagbox.module';
     AppComponent
   ],
   imports: [
-	BrowserModule,
+    BrowserModule,
+    IntoPipeModule,
+    TaggerModule,
     TagBoxModule
   ],
   providers: [

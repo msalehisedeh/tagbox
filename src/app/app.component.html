@@ -12,8 +12,11 @@
 <tagbox
     id="tag0"
     tabindex="0"
+    boxTitle="Image tags"
+    placeholder="Tag a new Image"
+    format="image:100px:auto:-:3:right"
+    (onaction)="updateAction($event)"
     [tags]="myImageTags"
-    format="image"
     [selectionpolicy]="mySelectionPolicy"
     [editpolicy]="myEditPolicy" 
     [dragpolicy]="myDragPolicy"></tagbox>
@@ -21,8 +24,11 @@
 <tagbox
     id="tagAA"
     tabindex="0"
-    [tags]="myAudioTags"
+    boxTitle="Audio tags"
+    placeholder="Tag a new Audio"
     format="audio"
+    (onaction)="updateAction($event)"
+    [tags]="myAudioTags"
     [selectionpolicy]="mySelectionPolicy"
     [editpolicy]="myEditPolicy" 
     [dragpolicy]="myDragPolicy"></tagbox>
@@ -30,8 +36,11 @@
 <tagbox
     id="tag44"
     tabindex="0"
-    [tags]="myVideoTags"
+    boxTitle="Video tags"
+    placeholder="Tag a new Video"
     format="video"
+    (onaction)="updateAction($event)"
+    [tags]="myVideoTags"
     [selectionpolicy]="mySelectionPolicy"
     [editpolicy]="myEditPolicy" 
     [dragpolicy]="myDragPolicy"></tagbox>
@@ -43,10 +52,12 @@
     maxtags="12" 
     mintags="1" 
     tabindex="0"
+    boxTitle="Text tags"
     title="something should hasppen"
     placeholder="Add new Tag"
     (onselect)="updateSelection($event)"
     (onchange)="updateTag($event)"
+    (onaction)="updateAction($event)"
     [tags]="myListTags"
     [selectedindex]="[1,3]"
     [beforeAction]="evaluateAction.bind(this)"
@@ -65,10 +76,12 @@
     selectedindex="1"
     delineateby=","
     allowduplicates="false"
-    format="mask * 4"
+    boxTitle="Masked tags"
+    format="mask"
     placeholder="Add Data"
     (onselect)="updateSelection($event)"
     (onchange)="updateTag($event)"
+    (onaction)="updateAction($event)"
     (onerror)="showError($event)"
     [tags]="myStringTags"
     [beforeAction]="evaluateAction.bind(this)"
@@ -76,6 +89,29 @@
     [editpolicy]="myEditPolicy2" 
     [dragpolicy]="myDragPolicy2"></tagbox>
 
+<ul class="tagger-list">
+  <li tagger="image-box" [sticky]="true" position="bottom:right"
+  taggerTag="https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?h=350&auto=compress&cs=tinysrgb"
+  (taggerChanged)="itemTagUpdate($event)"><img 
+    src="https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?h=350&auto=compress&cs=tinysrgb"
+    height="100px" /></li>
+  <li><li><span 
+    rawContent="https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?h=350&auto=compress&cs=tinysrgb"
+    into="image:auto:100px:alt text" 
+    intoName="myImage" intoId="myImage"
+
+    tagger="image-box"
+    taggerTag="https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?h=350&auto=compress&cs=tinysrgb"
+    (taggerChanged)="itemTagUpdate($event)"></span></li>
+  <li><span 
+    rawContent="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" 
+    into="video:auto:100px:alt text"
+    intoName="video 1" intoId="video1" 
+
+    tagger="video-box"
+    taggerTag="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+    (taggerChanged)="itemTagUpdate($event)"></span></li>
+</ul>
 <ul class="logger">
   <li *ngFor="let x of events" [textContent]="x | json"></li>
 </ul>

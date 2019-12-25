@@ -15,8 +15,6 @@ import {
   EventEmitter
 } from '@angular/core';
 
-import { InToPipe } from '@sedeh/into-pipes';
-
 import {
   DragDropPolicy,
   Selectionpolicy,
@@ -36,6 +34,9 @@ export class TagComponent implements OnInit {
   originalName: string;
   selectedFiller = -1;
   fillerList: string[];
+  
+  @Output("onaction")
+  onaction= new EventEmitter()
 
   @Output("onfocus")
   onfocus= new EventEmitter()
@@ -85,21 +86,13 @@ export class TagComponent implements OnInit {
   @Input("dragpolicy")
   dragpolicy: DragDropPolicy;
 
-  @ViewChild("editor")
-  editor;
-
-  @ViewChild("selector")
-  selector;
-
-  @ViewChild("holder")
-  holder;
-
-  @ViewChild("filler")
-  filler;
+  @ViewChild("editor", {static: false}) editor;
+  @ViewChild("selector", {static: false}) selector;
+  @ViewChild("holder", {static: false}) holder;
+  @ViewChild("filler", {static: false}) filler;
 
   constructor(
     private dataTransfer: TagTransfer,
-    private into: InToPipe,
     public el: ElementRef, 
     private renderer: Renderer
   ){
@@ -342,12 +335,8 @@ export class TagComponent implements OnInit {
     }
   }
 
-  formattedName() {
-    let result = this.name;
-    if (this.format) {
-      result = this.into.transform(this.name, this.format);
-    }
-    return result;
+  componentChanged(event: any) {
+    this.onaction.emit(event);
   }
 
 }

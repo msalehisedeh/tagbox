@@ -21,9 +21,16 @@
   </ul>
 </div>
 <span #holder
-    *ngIf="!editMode" 
+    *ngIf="!editMode && placeholder" 
     [tabindex]="isEditable() ? 0 : -1" 
-    [innerHTML]="placeholder ? placeholder : formattedName()"></span>
+    [innerHTML]="placeholder"></span>
+<span #holder
+    *ngIf="!editMode && !placeholder" 
+    [tabindex]="isEditable() ? 0 : -1" 
+    [rawContent]="name"
+    intoName="audio 1" intoId="audio1" 
+    [into]="format"
+    [onComponentChange]="componentChanged.bind(this)"></span>
 <span 
     *ngIf="!editMode && removable" 
     tabindex="0" 

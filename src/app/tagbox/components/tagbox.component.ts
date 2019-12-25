@@ -42,8 +42,14 @@ export class TagBoxComponent implements OnInit, OnChanges {
   @Output("onselect")
   onselect= new EventEmitter()
 
+  @Output("onaction")
+  onaction= new EventEmitter()
+
   @Input("beforeAction")
   beforeAction = (event) => true;
+  
+  @Input("boxTitle")
+  boxTitle: string;
 
   @Input("id")
   id: string;
@@ -118,7 +124,11 @@ export class TagBoxComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes) {
-
+    if (changes.tags) {
+      if (this.tags && (this.tags instanceof Array)) {
+        this._tags = this.tags;
+      }
+    }
   }
 
   itemSelectedAt(index) {
@@ -332,6 +342,9 @@ export class TagBoxComponent implements OnInit, OnChanges {
         }
       }
     } 
+  }
+  onTagAction(event: any) {
+    this.onaction.emit(event);
   }
   onTagSelect(event: TagComponent) {
     if (this.selectionpolicy !== Selectionpolicy.disabled) {

@@ -6,6 +6,8 @@ import {
   EditPolicy
 } from './tagbox/interfaces/tagbox.interfaces';
 
+import { TaggerService } from '@sedeh/tagger';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -13,7 +15,7 @@ import {
 })
 export class AppComponent {
   title = 'Tag Box';
-  events: string[] = [];
+  events: any[] = [];
 
   myAudioTags= [
     "https://google.github.io/tacotron/publications/tacotron2/demos/gan_or_vae.wav"
@@ -36,21 +38,36 @@ export class AppComponent {
 
   myAutocompleteSource: string[] = ["something 6", "something 9","something 11", "something 12"];
 
-  constructor() {
-
+  constructor(
+    private taggerService: TaggerService
+  ) {
+    this.myImageTags.map((item) => this.taggerService.updateTag('immage-box', true, item));
+    this.myVideoTags.map((item) => this.taggerService.updateTag('video-box', true, item));
   }
 
-  showError(event) {
+  showError(event: any) {
     this.events.push(event);
   }
-  evaluateAction(event) {
+  evaluateAction(event: any) {
     this.events.push(event);
     return true;
   }
-  updateSelection(event) {
+  updateSelection(event: any) {
     this.events.push(event);
   }
-  updateTag(event) {
+  updateTag(event: any) {
     this.events.push(event);
+  }
+  updateAction(event: any) {
+    this.events.push(event);
+  }
+  itemTagUpdate(event: any) {
+    const list = this.taggerService.getTaggedItems(event);
+    if (event === 'image-box') {
+      this.myImageTags = list;
+    } else if (event === 'video-box') {
+      this.myVideoTags = list;
+    }
+    this.events.push({eventId: event, items: list});
   }
 }

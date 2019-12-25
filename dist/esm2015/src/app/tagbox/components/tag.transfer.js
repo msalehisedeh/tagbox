@@ -1,36 +1,18 @@
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
- */
+import * as tslib_1 from "tslib";
 import { Injectable } from '@angular/core';
-export class TagTransfer {
+let TagTransfer = class TagTransfer {
     constructor() {
         this.data = {};
     }
-    /**
-     * @param {?} name
-     * @param {?} value
-     * @return {?}
-     */
     setData(name, value) {
         this.data[name] = value;
     }
-    /**
-     * @param {?} name
-     * @return {?}
-     */
     getData(name) {
         return this.data[name];
     }
-}
-TagTransfer.decorators = [
-    { type: Injectable }
-];
-/** @nocollapse */
-TagTransfer.ctorParameters = () => [];
-if (false) {
-    /** @type {?} */
-    TagTransfer.prototype.data;
-}
-
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGFnLnRyYW5zZmVyLmpzIiwic291cmNlUm9vdCI6Im5nOi8vQHNlZGVoL3RhZ2JveC8iLCJzb3VyY2VzIjpbInNyYy9hcHAvdGFnYm94L2NvbXBvbmVudHMvdGFnLnRyYW5zZmVyLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7QUFBQSxPQUFPLEVBQUUsVUFBVSxFQUFFLE1BQU0sZUFBZSxDQUFDO0FBRzNDLE1BQU07SUFJRjtvQkFGb0IsRUFBRTtLQUVOOzs7Ozs7SUFFaEIsT0FBTyxDQUFDLElBQVksRUFBRSxLQUFVO1FBQzVCLElBQUksQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLEdBQUcsS0FBSyxDQUFDO0tBQzNCOzs7OztJQUVELE9BQU8sQ0FBQyxJQUFZO1FBQ2hCLE1BQU0sQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxDQUFDO0tBQzFCOzs7WUFiSixVQUFVIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgSW5qZWN0YWJsZSB9IGZyb20gJ0Bhbmd1bGFyL2NvcmUnO1xyXG5cclxuQEluamVjdGFibGUoKVxyXG5leHBvcnQgY2xhc3MgVGFnVHJhbnNmZXIge1xyXG4gICAgXHJcbiAgICBwcml2YXRlIGRhdGE6IGFueSA9IHt9O1xyXG5cclxuICAgIGNvbnN0cnVjdG9yKCkge31cclxuXHJcbiAgICBzZXREYXRhKG5hbWU6IHN0cmluZywgdmFsdWU6IGFueSl7XHJcbiAgICAgICAgdGhpcy5kYXRhW25hbWVdID0gdmFsdWU7XHJcbiAgICB9XHJcblxyXG4gICAgZ2V0RGF0YShuYW1lOiBzdHJpbmcpIHtcclxuICAgICAgICByZXR1cm4gdGhpcy5kYXRhW25hbWVdO1xyXG4gICAgfVxyXG4gICAgICAgICAgICBcclxufSJdfQ==
+};
+TagTransfer = tslib_1.__decorate([
+    Injectable()
+], TagTransfer);
+export { TagTransfer };
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGFnLnRyYW5zZmVyLmpzIiwic291cmNlUm9vdCI6Im5nOi8vQHNlZGVoL3RhZ2JveC8iLCJzb3VyY2VzIjpbInNyYy9hcHAvdGFnYm94L2NvbXBvbmVudHMvdGFnLnRyYW5zZmVyLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7QUFBQSxPQUFPLEVBQUUsVUFBVSxFQUFFLE1BQU0sZUFBZSxDQUFDO0FBRzNDLElBQWEsV0FBVyxHQUF4QixNQUFhLFdBQVc7SUFJcEI7UUFGUSxTQUFJLEdBQVEsRUFBRSxDQUFDO0lBRVIsQ0FBQztJQUVoQixPQUFPLENBQUMsSUFBWSxFQUFFLEtBQVU7UUFDNUIsSUFBSSxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsR0FBRyxLQUFLLENBQUM7SUFDNUIsQ0FBQztJQUVELE9BQU8sQ0FBQyxJQUFZO1FBQ2hCLE9BQU8sSUFBSSxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsQ0FBQztJQUMzQixDQUFDO0NBRUosQ0FBQTtBQWRZLFdBQVc7SUFEdkIsVUFBVSxFQUFFO0dBQ0EsV0FBVyxDQWN2QjtTQWRZLFdBQVciLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBJbmplY3RhYmxlIH0gZnJvbSAnQGFuZ3VsYXIvY29yZSc7XHJcblxyXG5ASW5qZWN0YWJsZSgpXHJcbmV4cG9ydCBjbGFzcyBUYWdUcmFuc2ZlciB7XHJcbiAgICBcclxuICAgIHByaXZhdGUgZGF0YTogYW55ID0ge307XHJcblxyXG4gICAgY29uc3RydWN0b3IoKSB7fVxyXG5cclxuICAgIHNldERhdGEobmFtZTogc3RyaW5nLCB2YWx1ZTogYW55KXtcclxuICAgICAgICB0aGlzLmRhdGFbbmFtZV0gPSB2YWx1ZTtcclxuICAgIH1cclxuXHJcbiAgICBnZXREYXRhKG5hbWU6IHN0cmluZykge1xyXG4gICAgICAgIHJldHVybiB0aGlzLmRhdGFbbmFtZV07XHJcbiAgICB9XHJcbiAgICAgICAgICAgIFxyXG59Il19

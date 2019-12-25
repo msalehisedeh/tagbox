@@ -11,7 +11,8 @@ Have you ever been in need of a tag box that can provide many built in functiona
 ```
 DEPENDENCIES: 
 	"font-awesome": "^4.7.0", 
-    "@sedeh/into-pipes": "^2.2.4",
+  "@sedeh/wizard-storage": "^1.2.5",
+  "@sedeh/into-pipes": "^2.3.5",
 ```
 ## Functionalities
 
@@ -181,6 +182,10 @@ updateTag(event) {
 
 | Version | Description                                                                                              |
 |---------|----------------------------------------------------------------------------------------------------------|
+| 2.0.0   | Updated to Angular 8.                                                                                    |
+| 1.2.8   | Added dependency to @sedeh/tagger. Now it is possible to add/remove tags independent of user action on a particular tag box. |
+| 1.2.7   | Updated dependencies to get benefit of events handling and have pop hover on image!!                     |
+| 1.2.6   | Added boxTitle to display a group title. Updated tags with better event handling and made use of into pipe directive instead of into pipe. This will enable you to create custom pipes and tag items with your custom pipes. |
 | 1.2.5   | Updated dependencies to fix audio tagging!!                                                              |
 | 1.2.4   | Updated dependencies. Now you can tag an audio!!                                                         |
 | 1.2.3   | Updated dependencies to fix IE drag & drop issues.                                                       |

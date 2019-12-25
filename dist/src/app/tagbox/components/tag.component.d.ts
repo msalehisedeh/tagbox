@@ -1,22 +1,21 @@
 import { OnInit, ElementRef, Renderer, EventEmitter } from '@angular/core';
-import { InToPipe } from '@sedeh/into-pipes';
 import { DragDropPolicy, Selectionpolicy, EditPolicy } from '../interfaces/tagbox.interfaces';
 import { TagTransfer } from './tag.transfer';
 export declare class TagComponent implements OnInit {
     private dataTransfer;
-    private into;
     el: ElementRef;
     private renderer;
     editMode: boolean;
     originalName: string;
     selectedFiller: number;
     fillerList: string[];
-    onfocus: EventEmitter<{}>;
-    onchange: EventEmitter<{}>;
-    onselect: EventEmitter<{}>;
-    onremove: EventEmitter<{}>;
-    onadd: EventEmitter<{}>;
-    ondrop: EventEmitter<{}>;
+    onaction: EventEmitter<any>;
+    onfocus: EventEmitter<any>;
+    onchange: EventEmitter<any>;
+    onselect: EventEmitter<any>;
+    onremove: EventEmitter<any>;
+    onadd: EventEmitter<any>;
+    ondrop: EventEmitter<any>;
     format: string;
     removable: boolean;
     maxlength: string;
@@ -31,7 +30,7 @@ export declare class TagComponent implements OnInit {
     selector: any;
     holder: any;
     filler: any;
-    constructor(dataTransfer: TagTransfer, into: InToPipe, el: ElementRef, renderer: Renderer);
+    constructor(dataTransfer: TagTransfer, el: ElementRef, renderer: Renderer);
     ngOnInit(): void;
     dragStart(event: any): void;
     drag(event: any): void;
@@ -40,7 +39,7 @@ export declare class TagComponent implements OnInit {
     dragEnter(event: any): void;
     dragLeave(event: any): void;
     dragOver(event: any): void;
-    private isIE();
+    private isIE;
     allowDrop(event: any): boolean;
     allowDrag(): boolean;
     keyup(event: any): void;
@@ -57,5 +56,5 @@ export declare class TagComponent implements OnInit {
     init(): void;
     reset(): void;
     remove(): void;
-    formattedName(): string;
+    componentChanged(event: any): void;
 }
