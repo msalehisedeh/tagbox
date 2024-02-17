@@ -1,0 +1,32 @@
+:host {
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
+  min-height: 50px;
+  padding: 5px;
+  width: 100%;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  position: relative;
+
+  &.alert {
+    background-color: #ff9f9b;
+    border-color: #880500;
+  }
+  .box-title {
+    display: block;
+    position: absolute;
+    top: -11px;
+    left: 10px;
+    background-color: #fff;
+    padding: 0 5px;
+  }
+}
+:host:focus {
+  border-color: #0ba;
+}
+:host:hover {
+  background-color: #ddd;
+}

@@ -1,0 +1,50 @@
+
+<span #selector
+    *ngIf="!editMode && removable && isSelectable()" 
+    tabindex="0" 
+    role="button"
+    [title]="isSelected ? 'Unselect tag' : 'Select tag'"
+    class="selection fa"
+    (click)="select()"></span>
+<input 
+    *ngIf="editMode" 
+    class="editor" 
+    [disabled]="!isEditable() && (!placeholder || !placeholder.length)"
+    (blur)="tabout($event)"
+    (keyup)="edit($event)" 
+    [value]="name"
+    [attr.maxlength]="maxlength"
+    [attr.placeholder]="placeholder" #editor/>
+<div class="autocomplete off" *ngIf="editMode && autocomplete" #filler>
+  <ul>
+      <li *ngFor="let x of fillerList; let i = index" 
+        (click)="selectedFiller = i" 
+        [class.selected]="selectedFiller === i"
+        [textContent]="x"></li>
+  </ul>
+</div>
+<span #holder
+    *ngIf="!editMode && placeholder" 
+    class="holder"
+    [tabindex]="isEditable() ? 0 : -1" 
+    [innerHTML]="placeholder"></span>
+<span #holder
+    *ngIf="!editMode && !placeholder" 
+    class="content"
+    [tabindex]="isEditable() ? 0 : -1" 
+    [rawContent]="name"
+    intoName="tag 1" intoId="tag1" 
+    [into]="format"
+    [onComponentChange]="componentChanged.bind(this)"></span>
+<span 
+    *ngIf="!editMode && removable" 
+    tabindex="0" 
+    role="button"
+    title="Remove tag"
+    class="remove fa fa-times" 
+    (click)="remove()"></span>
+<span 
+    *ngIf="allowedToAdd() && (placeholder && placeholder.length)" 
+    role="button"
+    title="Create new tag"
+    class="placeholder fa fa-plus-circle"></span>

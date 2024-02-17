@@ -1,0 +1,29 @@
+{
+  "name": "@sedeh/tagbox",
+  "version": "3.0.0",
+  "peerDependencies": {
+    "@angular/common": "^15.2.0",
+    "@angular/core": "^15.2.0",
+    "@sedeh/into-pipes": "^4.1.0",
+    "@sedeh/wizard-storage": "^3.0.0",
+    "@sedeh/tagger": "^3.0.0",
+    "font-awesome": "^4.7.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "keywords": [
+    "angular 6+",
+    "tags",
+    "tagger",
+    "tagging",
+    "tokenize",
+    "tokenizer",
+    "widget",
+    "autocomplete tagger",
+    "image tagger",
+    "audio tagger",
+    "video tagger"
+  ],
+  "sideEffects": false
+}

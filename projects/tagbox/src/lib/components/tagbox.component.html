@@ -1,0 +1,44 @@
+
+<span *ngIf="boxTitle" class="box-title" [textContent]="boxTitle"></span>
+<tag theme
+    *ngFor="let tag of _tags; let i=index"
+    [selected]="itemSelectionClass(i)"
+    [name]="tag"
+    [parent]="this"
+    [removable]="isRemovable()"
+    [maxlength]="maxtaglength"
+    [format]="format"
+    [autocomplete]="autocomplete"
+    [attr.role]="'listitem'"
+    [selectionpolicy]="selectionpolicy"
+    [editpolicy]="editpolicy" 
+    [dragpolicy]="dragpolicy"
+    (ondrop)="onTagDrop($event)"
+    (onchange)="onTagChange($event)"
+    (onadd)="onTagAdd($event)"
+    (onremove)="onTagRemove($event)"
+    (onselect)="onTagSelect($event)"
+    (onaction)="onTagAction($event)"
+    (onfocus)="onTagFocus($event)">
+</tag>
+<tag theme
+    *ngIf="editpolicy !== 1 && editpolicy !== 4"
+    placeholder
+    tabindex="0"
+    name=""
+    [parent]="this"
+    [selected]="itemSelectionClass(-1)"
+    [maxlength]="maxtaglength"
+    [placeholder]="placeholder"
+    [format]="format"
+    [autocomplete]="autocomplete"
+    [attr.role]="'listitem'"
+    [selectionpolicy]="selectionpolicy"
+    [editpolicy]="editpolicy" 
+    [dragpolicy]="dragpolicy"
+    (ondrop)="onTagDrop($event)"
+    (onchange)="onTagChange($event)"
+    (onadd)="onTagAdd($event)"
+    (onaction)="onTagAction($event)"
+    (onremove)="onTagRemove($event)"
+    (onfocus)="onTagFocus($event)"></tag>

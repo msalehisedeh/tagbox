@@ -1,0 +1,44 @@
+
+::ng-deep video {
+    width: 131px;
+}
+.logger {
+    border: 1px solid #888;
+    background-color: #eee;
+    border-radius: 5px;
+    box-sizing: border-box;
+    display: block;
+    max-height: 222px;
+    overflow-y: auto;
+    position: relative;
+}
+fieldset {
+    border: 2px groove rgba(0, 0, 0, 0.1);
+    margin: 16px auto;
+    .pick-points {
+        border: 0;
+        height: 46px;
+        span {
+            margin: 2px 10px 2px 0;
+            label {
+                margin-right: 2px;
+            }
+        }
+    }
+}
+
+.resources {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #551234;
+    font-weight: bold;
+}
+.tagger-list {
+    display: flex;
+    flex-direction: row;
+    list-style-type: none;
+    li {
+        margin: 0 10px 0 0;
+    }
+}
+  
